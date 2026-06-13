@@ -7,6 +7,10 @@ require('mkdnflow').setup {
     bib = false,
     yaml = false,
   },
+  path_resolution = {
+    primary = 'current',
+    fallback = 'first',
+  },
   to_do = {
     statuses = {
       complete = { marker = 'x' }, -- lowercase x

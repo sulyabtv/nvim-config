@@ -59,7 +59,13 @@ require('blink.cmp').setup {
   },
 
   sources = {
-    default = { 'lsp', 'path', 'snippets' },
+    default = { 'lsp', 'path', 'snippets', 'mkdnflow' },
+    providers = {
+      mkdnflow = {
+        name = 'Mkdnflow',
+        module = 'mkdnflow.completion.blink',
+      },
+    },
   },
 
   snippets = { preset = 'luasnip' },

@@ -19,6 +19,7 @@ require 'plugins.noice'
 require 'plugins.zen'
 require 'plugins.markdown-toc'
 require 'plugins.mkdnflow'
+require 'plugins.scrolleof'
 require 'plugins.bufferline'
 require 'plugins.lualine'
 
