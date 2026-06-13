@@ -1,11 +1,17 @@
--- Linting
-
 vim.pack.add { 'https://github.com/mfussenegger/nvim-lint' }
 
 local lint = require 'lint'
 lint.linters_by_ft = {
   markdown = { 'markdownlint' }, -- Make sure to install `markdownlint` via mason / npm
 }
+
+-- pass in markdownlint config if it exists
+local config_path = vim.fn.expand '~/.markdownlint.json'
+if vim.uv.fs_stat(config_path) then
+  local markdownlint = lint.linters.markdownlint
+  table.insert(markdownlint.args, 1, config_path)
+  table.insert(markdownlint.args, 1, '--config')
+end
 
 -- To allow other plugins to add linters to require('lint').linters_by_ft,
 -- instead set linters_by_ft like this:
