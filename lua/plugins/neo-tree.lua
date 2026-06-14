@@ -51,16 +51,4 @@ require('neo-tree').setup {
   },
 }
 
--- NO italics! -.-
-local function fix_neotree_highlights()
-  -- strip italics
-  for _, g in ipairs { 'NeoTreeMessage', 'NeoTreeRootName', 'NeoTreeGitConflict', 'NeoTreeGitUntracked' } do
-    local hl = vim.api.nvim_get_hl(0, { name = g })
-    hl.italic = nil
-    ---@diagnostic disable-next-line: param-type-mismatch
-    vim.api.nvim_set_hl(0, g, hl)
-  end
-end
-
-vim.api.nvim_create_autocmd('FileType', { pattern = 'neo-tree', callback = fix_neotree_highlights })
 vim.keymap.set('n', '<leader>e', '<Cmd>Neotree reveal<CR>', { desc = 'NeoTree reveal', silent = true })

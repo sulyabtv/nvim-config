@@ -5,20 +5,8 @@ require('evergarden').setup {
     variant = 'winter', -- 'winter'|'fall'|'spring'|'summer'
     accent = 'green',
   },
-  editor = {
-    cursor = { color = 'accent' },
-  },
   style = {
-    tabline = { 'reverse' },
-    search = { 'reverse' },
-    incsearch = {},
-    diagnostics = { 'undercurl' },
-    types = {},
-    keyword = {},
-    comment = {},
-    spell = { 'undercurl' },
-    notes = { 'bold', 'reverse' },
-    disable_styles = {},
+    disable_styles = { 'italic' },
   },
 }
 

@@ -17,6 +17,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
       vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
     end
 
+    -- LSP definition
+    map('gd', vim.lsp.buf.definition, 'Goto Definition')
+
+    -- Toggle diagnostics to reduce visual spam
+    map('<leader>td', function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, 'Toggle diagnostics')
+
     -- Rename the variable under your cursor.
     --  Most Language Servers support renaming across files, etc.
     map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
@@ -118,6 +124,9 @@ local servers = {
     settings = {
       Lua = {
         format = { enable = false }, -- Disable formatting (formatting is done by stylua)
+        diagnostics = {
+          disable = { 'missing-fields' },
+        },
       },
     },
   },

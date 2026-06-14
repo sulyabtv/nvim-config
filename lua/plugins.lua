@@ -15,6 +15,7 @@ require 'plugins.lint'
 -- Load additional plugins
 require 'plugins.auto-session'
 require 'plugins.snacks'
+require 'plugins.treesitter-textobjects'
 require 'plugins.noice'
 require 'plugins.zen'
 require 'plugins.markdown-toc'

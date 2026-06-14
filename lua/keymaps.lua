@@ -92,3 +92,5 @@ vim.keymap.set('n', '<leader>tx', function()
     vim.notify('Not in a tmux session', vim.log.levels.WARN)
   end
 end, { desc = 'Toggle tmux status bar' })
+
+vim.keymap.set('n', '<C-c>', '<cmd>%y+<cr>', { desc = 'Copy whole file to clipboard' })
