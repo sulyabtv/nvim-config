@@ -4,8 +4,9 @@ vim.pack.add { gh 'stevearc/conform.nvim' }
 
 require('conform').setup {
   notify_on_error = false,
+
   format_on_save = function(bufnr)
-    -- You can specify filetypes to autoformat on save here:
+    -- enable or override formatters for on-save formatting
     local enabled_filetypes = {
       lua = true,
       python = true,
@@ -13,17 +14,22 @@ require('conform').setup {
       rust = true,
       json = true,
       jsonc = true,
+      tex = 'trim_whitespace', -- for latex, only trim whitespace on save
     }
-    if enabled_filetypes[vim.bo[bufnr].filetype] then
-      return { timeout_ms = 500, lsp_fallback = true }
-    else
-      return nil
-    end
+
+    local choice = enabled_filetypes[vim.bo[bufnr].filetype]
+    if not choice then return nil end
+    local opts = { timeout_ms = 500, lsp_fallback = true }
+    if type(choice) == 'string' then opts.formatters = { choice } end
+    return opts
   end,
+
   default_format_opts = {
-    lsp_format = 'fallback', -- Use external formatters if configured below, otherwise use LSP formatting. Set to `false` to disable LSP formatting entirely.
+    -- Use external formatters if configured below, otherwise use LSP formatting.
+    -- Set to `false` to disable LSP formatting entirely.
+    lsp_format = 'fallback',
   },
-  -- You can also specify external formatters in here.
+
   formatters_by_ft = {
     lua = { 'stylua' },
     python = { 'ruff_format' },
@@ -31,8 +37,9 @@ require('conform').setup {
     rust = { 'rustfmt' },
     json = { 'prettier' },
     jsonc = { 'prettier' },
+    tex = { 'tex-fmt' },
     ['_'] = { 'trim_whitespace' },
   },
 }
 
-vim.keymap.set({ 'n', 'v' }, '<leader>F', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
+vim.keymap.set({ 'n', 'v' }, '<leader>F', function() require('conform').format { async = true } end, { desc = 'Format buffer or selection' })

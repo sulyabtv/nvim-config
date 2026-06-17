@@ -91,6 +91,7 @@ local servers = {
   },
   rust_analyzer = {},
   marksman = {},
+  texlab = {},
   html = {},
   cssls = {},
 
@@ -160,6 +161,7 @@ vim.list_extend(ensure_installed, {
   'prettier',
   'stylua',
   'markdownlint',
+  'tex-fmt',
 })
 
 require('mason-tool-installer').setup { ensure_installed = ensure_installed }

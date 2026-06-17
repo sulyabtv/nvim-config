@@ -9,8 +9,25 @@ local function gh(repo) return 'https://github.com/' .. repo end
 vim.pack.add { { src = gh 'nvim-treesitter/nvim-treesitter', version = 'main' } }
 
 -- Ensure basic parsers are installed
-local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+local parsers = {
+  'bash',
+  'c',
+  'diff',
+  'html',
+  'lua',
+  'luadoc',
+  'markdown',
+  'markdown_inline',
+  'query',
+  'vim',
+  'vimdoc',
+}
 require('nvim-treesitter').install(parsers)
+
+-- Do *not* use treesitter for the following languages
+local overrides = {
+  'latex',
+}
 
 ---@param buf integer
 ---@param language string
@@ -40,6 +57,9 @@ vim.api.nvim_create_autocmd('FileType', {
 
     local language = vim.treesitter.language.get_lang(filetype)
     if not language then return end
+
+    -- If this is an overridden language, do nothing
+    if vim.tbl_contains(overrides, language) then return end
 
     local installed_parsers = require('nvim-treesitter').get_installed 'parsers'
 

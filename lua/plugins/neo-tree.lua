@@ -51,4 +51,5 @@ require('neo-tree').setup {
   },
 }
 
-vim.keymap.set('n', '<leader>e', '<Cmd>Neotree reveal<CR>', { desc = 'NeoTree reveal', silent = true })
+vim.keymap.set('n', '<leader>E', '<Cmd>Neotree toggle<CR>', { desc = 'Toggle Neotree pane', silent = true })
+vim.keymap.set('n', '<leader>e', '<Cmd>Neotree reveal<CR>', { desc = 'Focus Neotree pane', silent = true })
