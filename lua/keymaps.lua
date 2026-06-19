@@ -97,3 +97,12 @@ vim.keymap.set('n', '<leader>tx', function()
 end, { desc = 'Toggle tmux status bar' })
 
 vim.keymap.set('n', '<C-c>', '<cmd>%y+<cr>', { desc = 'Copy whole file to clipboard' })
+
+-- shortcut to insert today's date
+vim.keymap.set('n', '<leader>md', function()
+  local date = tostring(os.date '%Y-%m-%d')
+  vim.api.nvim_put({ date }, 'c', true, true)
+end, { desc = 'Insert current date' })
+
+-- shortcut to update plugins
+vim.keymap.set('n', '<leader>pu', function() vim.pack.update(nil, { force = true }) end, { desc = 'Pack: update plugins' })
