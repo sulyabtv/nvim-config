@@ -94,6 +94,7 @@ local servers = {
   texlab = {},
   html = {},
   cssls = {},
+  bashls = {},
 
   -- Special Lua Config, as recommended by neovim help docs
   lua_ls = {
@@ -162,6 +163,8 @@ vim.list_extend(ensure_installed, {
   'stylua',
   'markdownlint',
   'tex-fmt',
+  'shfmt',
+  'shellcheck',
 })
 
 require('mason-tool-installer').setup { ensure_installed = ensure_installed }

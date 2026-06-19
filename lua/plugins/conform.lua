@@ -15,6 +15,7 @@ require('conform').setup {
       json = true,
       jsonc = true,
       tex = 'trim_whitespace', -- for latex, only trim whitespace on save
+      sh = true,
     }
 
     local choice = enabled_filetypes[vim.bo[bufnr].filetype]
@@ -38,6 +39,7 @@ require('conform').setup {
     json = { 'prettier' },
     jsonc = { 'prettier' },
     tex = { 'tex-fmt' },
+    sh = { 'shfmt' },
     ['_'] = { 'trim_whitespace' },
   },
 }
