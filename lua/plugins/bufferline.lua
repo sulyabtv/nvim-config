@@ -16,9 +16,8 @@ bufferline.setup {
     always_show_bufferline = true,
     offsets = {
       {
-        -- no tabs on the neo-tree window
-        filetype = 'neo-tree',
-        highlight = 'Directory',
+        -- no tabs on the snacks explorer window
+        filetype = 'snacks_layout_box',
       },
     },
   },

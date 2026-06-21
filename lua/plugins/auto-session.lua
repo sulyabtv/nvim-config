@@ -3,8 +3,7 @@ vim.pack.add { 'https://github.com/rmagatti/auto-session' }
 vim.o.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions'
 
 require('auto-session').setup {
-  pre_save_cmds = { 'Neotree close' },
-  post_restore_cmds = { 'Neotree filesystem show' },
+  post_restore_cmds = { function() Snacks.explorer.open { focus = false } end },
 }
 
 -- session picker (their <leader>p, or pick your own key)

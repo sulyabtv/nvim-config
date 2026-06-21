@@ -6,8 +6,7 @@ require('snacks').setup {
   animate = { enabled = true },
   bigfile = { enabled = true },
   bufdelete = { enabled = true },
-  dim = { enabled = true },
-  explorer = { enabled = true, replace_netrw = false },
+  explorer = { enabled = true, replace_netrw = true },
   indent = { enabled = true },
   input = { enabled = true },
   lazygit = {
@@ -23,8 +22,27 @@ require('snacks').setup {
         hidden = true,
         ignored = true,
         exclude = { '.git' },
-        auto_close = true,
-        layout = { preset = 'default', preview = true },
+        layout = {
+          layout = {
+            width = 40,
+          },
+        },
+        win = {
+          input = {
+            keys = {
+              ['<c-p>'] = false, -- use to toggle windows (global keymap)
+              ['<Esc>'] = { '', mode = 'n' }, -- do nothing on Esc
+            },
+          },
+          list = {
+            keys = {
+              ['<BS>'] = 'explorer_close', -- close (fold) directory
+              ['h'] = 'explorer_up', -- go up in path
+              ['<c-p>'] = false, -- use to toggle windows (global keymap)
+              ['<Esc>'] = { '', mode = 'n' }, -- do nothing on Esc
+            },
+          },
+        },
       },
       files = {
         hidden = true,
@@ -36,12 +54,31 @@ require('snacks').setup {
       },
     },
   },
+  quickfile = { enabled = true },
   rename = { enabled = true },
   scope = { enabled = true },
   terminal = { enabled = true, win = { position = 'bottom', height = 12 } },
   toggle = { enabled = true },
   words = { enabled = true },
-  zen = { enabled = true },
+  zen = {
+    enabled = true,
+    toggles = {
+      -- NOTE: this table is NOT merged
+      dim = false,
+      git_signs = false,
+      mini_diff_signs = false,
+    },
+    show = {
+      statusline = true,
+    },
+    win = {
+      width = 100,
+      backdrop = {
+        transparent = false, -- hide stuff in the background
+        blend = 99, -- but use the bg color
+      },
+    },
+  },
 }
 
 -- helper: current file's dir, falling back to cwd
@@ -52,7 +89,6 @@ local function file_dir()
 end
 
 -- find stuff
-vim.keymap.set('n', '<leader>fe', function() Snacks.explorer.reveal() end, { desc = 'Open file explorer' })
 vim.keymap.set('n', '<leader>ff', function() Snacks.picker.files() end, { desc = 'Find files' })
 vim.keymap.set('n', '<leader>fg', function() Snacks.picker.grep() end, { desc = 'Grep (live)' })
 vim.keymap.set('n', '<leader>fr', function() Snacks.picker.recent() end, { desc = 'Recent files' })
@@ -69,7 +105,6 @@ vim.keymap.set('n', '<leader>gd', function() Snacks.lazygit.open { cwd = file_di
 vim.keymap.set('n', '<leader>glr', function() Snacks.lazygit.log { cwd = file_dir() } end, { desc = 'Lazygit Reflog' })
 vim.keymap.set('n', '<leader>glf', function() Snacks.picker.git_log_file { cwd = file_dir() } end, { desc = 'Git log (file)' })
 vim.keymap.set('n', '<leader>gll', function() Snacks.picker.git_log_line { cwd = file_dir() } end, { desc = 'Git log (line)' })
-vim.keymap.set('n', '<leader>glc', function() Snacks.picker.git_log { cwd = file_dir() } end, { desc = 'Git log' })
 vim.keymap.set('n', '<leader>gs', function() Snacks.picker.git_status { cwd = file_dir() } end, { desc = 'Git status' })
 vim.keymap.set('n', '<leader>gS', function() Snacks.picker.git_stash { cwd = file_dir() } end, { desc = 'Git stash' })
 vim.keymap.set('n', '<leader>gc', function() Snacks.picker.git_log { cwd = file_dir() } end, { desc = 'Git commits' })
@@ -103,4 +138,59 @@ vim.keymap.set('n', '<leader>pp', function() Snacks.picker.pickers() end, { desc
 vim.keymap.set('n', '<leader>x', function() Snacks.bufdelete() end, { desc = 'Close current buffer' })
 vim.keymap.set('n', '<leader>.', function() Snacks.scratch() end, { desc = 'Toggle scratch buffer' })
 vim.keymap.set('n', '<leader>S', function() Snacks.scratch.select() end, { desc = 'Select scratch buffer' })
-vim.keymap.set('n', '<leader>tt', function() Snacks.terminal.toggle() end, { desc = 'Toggle terminal (bottom, 15 lines)' })
+vim.keymap.set('n', '<leader>tt', function() Snacks.terminal.toggle() end, { desc = 'Toggle terminal' })
+
+-- explorer
+vim.keymap.set('n', '<leader>E', function() Snacks.explorer.open { focus = false } end, { desc = 'Toggle explorer pane' })
+local last_win = nil -- remembers last window to jump back to from explorer
+vim.keymap.set('n', '<leader>e', function()
+  -- if in zen mode, exit (explorer is hidden in zen mode)
+  local win = Snacks.zen.win
+  if win and win:valid() then win:close() end
+
+  -- check the explorer state
+  local explorer = Snacks.picker.get({ source = 'explorer' })[1]
+
+  if explorer == nil then
+    -- no explorer => open
+    last_win = vim.api.nvim_get_current_win()
+    Snacks.picker.explorer()
+  elseif explorer:is_focused() then
+    -- we're in the explorer => jump back to where we came from
+    if last_win and vim.api.nvim_win_is_valid(last_win) then
+      vim.api.nvim_set_current_win(last_win)
+    else
+      vim.cmd.wincmd 'p' -- fallback if that window is gone
+    end
+  else
+    -- we are not in explorer => switch to it
+    last_win = vim.api.nvim_get_current_win()
+    explorer:focus 'list'
+  end
+end, { desc = 'Focus explorer pane' })
+
+-- zen
+vim.keymap.set('n', '<leader>z', function() Snacks.zen.zen() end, { desc = 'Toggle Zen mode' })
+
+-- autocmd to quit if only snacks windows remain
+vim.api.nvim_create_autocmd('QuitPre', {
+  callback = function()
+    local snacks_windows = {}
+    local floating_windows = {}
+    local windows = vim.api.nvim_list_wins()
+    for _, w in ipairs(windows) do
+      local filetype = vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(w) })
+      if filetype:match 'snacks_' ~= nil then
+        table.insert(snacks_windows, w)
+      elseif vim.api.nvim_win_get_config(w).relative ~= '' then
+        table.insert(floating_windows, w)
+      end
+    end
+    if 1 == #windows - #floating_windows - #snacks_windows then
+      -- Should quit, so we close all Snacks windows.
+      for _, w in ipairs(snacks_windows) do
+        vim.api.nvim_win_close(w, true)
+      end
+    end
+  end,
+})

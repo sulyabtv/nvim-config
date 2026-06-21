@@ -104,5 +104,26 @@ vim.keymap.set('n', '<leader>md', function()
   vim.api.nvim_put({ date }, 'c', true, true)
 end, { desc = 'Insert current date' })
 
--- shortcut to update plugins
+-- vim pack shortcuts
 vim.keymap.set('n', '<leader>pu', function() vim.pack.update(nil, { force = true }) end, { desc = 'Pack: update plugins' })
+vim.keymap.set('n', '<leader>pl', function() vim.pack.update(nil, { offline = true }) end, { desc = 'Pack: list installed plugins' })
+vim.keymap.set('n', '<leader>pd', function()
+  local names = {}
+  for _, p in ipairs(vim.pack.get()) do
+    if not p.active then names[#names + 1] = p.spec.name end
+  end
+  table.sort(names)
+
+  if #names == 0 then
+    vim.notify('No inactive plugins to delete.', vim.log.levels.INFO)
+    return
+  end
+
+  vim.ui.select(names, { prompt = 'Delete plugin:' }, function(choice)
+    if not choice then return end
+    if vim.fn.confirm('Delete ' .. choice .. '?', '&Yes\n&No', 2) == 1 then
+      local ok, err = pcall(vim.pack.del, { choice })
+      if not ok then vim.notify('Could not delete ' .. choice .. ': ' .. tostring(err), vim.log.levels.ERROR) end
+    end
+  end)
+end, { desc = 'Delete an inactive plugin' })

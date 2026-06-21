@@ -8,10 +8,10 @@ require('leap').opts = {
 }
 
 -- leap to another spot in the same window
-vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap)')
+vim.keymap.set({ 'n', 'x', 'o' }, 'q', '<Plug>(leap)')
 
 -- leap to a different window
-vim.keymap.set('n', 'S', '<Plug>(leap-from-window)')
+vim.keymap.set('n', 'Q', '<Plug>(leap-from-window)')
 
 -- remote operations
 -- gs{leap}$y, dgs{leap}$ etc.
