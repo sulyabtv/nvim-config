@@ -14,31 +14,22 @@ vim.api.nvim_create_autocmd('LspAttach', {
     -- for LSP related items. It sets the mode, buffer and description for us each time.
     local map = function(keys, func, desc, mode)
       mode = mode or 'n'
-      vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+      vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = desc })
     end
-
-    -- LSP definition
-    map('gd', vim.lsp.buf.definition, 'Goto Definition')
 
     -- Toggle diagnostics to reduce visual spam
     map('<leader>td', function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, 'Toggle diagnostics')
 
     -- Rename the variable under your cursor.
     --  Most Language Servers support renaming across files, etc.
-    map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
+    map('<leader>ln', vim.lsp.buf.rename, 'LSP rename')
 
     -- Execute a code action, usually your cursor needs to be on top of an error
     -- or a suggestion from your LSP for this to activate.
-    map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-
-    -- WARN: This is not Goto Definition, this is Goto Declaration.
-    --  For example, in C this would take you to the header.
-    map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+    map('<leader>la', vim.lsp.buf.code_action, 'Code action', { 'n', 'x' })
 
     -- The following two autocommands are used to highlight references of the
     -- word under your cursor when your cursor rests there for a little while.
-    --    See `:help CursorHold` for information about when this is executed
-    --
     -- When you move your cursor, the highlights will be cleared (the second autocommand).
     local client = vim.lsp.get_client_by_id(event.data.client_id)
     if client and client:supports_method('textDocument/documentHighlight', event.buf) then
@@ -69,7 +60,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     --
     -- This may be unwanted, since they displace some of your code
     if client and client:supports_method('textDocument/inlayHint', event.buf) then
-      map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
+      map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, 'Toggle Inlay Hints')
     end
   end,
 })
@@ -106,6 +97,7 @@ local servers = {
         if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
       end
 
+      ---@diagnostic disable-next-line: param-type-mismatch
       client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
         runtime = {
           version = 'LuaJIT',

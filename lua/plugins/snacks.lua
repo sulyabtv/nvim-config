@@ -72,7 +72,7 @@ require('snacks').setup {
       statusline = true,
     },
     win = {
-      width = 100,
+      width = 105,
       backdrop = {
         transparent = false, -- hide stuff in the background
         blend = 99, -- but use the bg color
@@ -115,6 +115,7 @@ vim.keymap.set('n', '<leader>ls', function() Snacks.picker.lsp_symbols() end, { 
 vim.keymap.set('n', '<leader>lS', function() Snacks.picker.lsp_workspace_symbols() end, { desc = 'Workspace symbols' })
 vim.keymap.set('n', '<leader>lr', function() Snacks.picker.lsp_references() end, { desc = 'References' })
 vim.keymap.set('n', '<leader>ld', function() Snacks.picker.lsp_definitions() end, { desc = 'Definitions' })
+vim.keymap.set('n', '<leader>lt', function() Snacks.picker.lsp_type_definitions() end, { desc = 'Type Definitions' })
 vim.keymap.set('n', '<leader>lD', function() Snacks.picker.lsp_declarations() end, { desc = 'Declarations' })
 vim.keymap.set('n', '<leader>lg', function() Snacks.picker.diagnostics_buffer() end, { desc = 'Diagnostics (buffer)' })
 vim.keymap.set('n', '<leader>lG', function() Snacks.picker.diagnostics() end, { desc = 'Diagnostics (workspace)' })

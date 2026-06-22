@@ -76,4 +76,20 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- vim: ts=2 sts=2 sw=2 et
+-- use M-o to incrementally select outer treesitter node
+vim.keymap.set({ 'n', 'x', 'o' }, '<M-o>', function()
+  if vim.treesitter.get_parser(nil, nil, { error = false }) then
+    require('vim.treesitter._select').select_parent(vim.v.count1)
+  else
+    vim.lsp.buf.selection_range(vim.v.count1)
+  end
+end, { desc = 'Incremental select parent node' })
+
+-- use M-i to incrementally select inner treesitter node
+vim.keymap.set({ 'n', 'x', 'o' }, '<M-i>', function()
+  if vim.treesitter.get_parser(nil, nil, { error = false }) then
+    require('vim.treesitter._select').select_child(vim.v.count1)
+  else
+    vim.lsp.buf.selection_range(-vim.v.count1)
+  end
+end, { desc = 'Incremental select child node' })

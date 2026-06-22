@@ -15,10 +15,18 @@ end
 --
 -- Examples:
 --  - va)  - [V]isually select [A]round [)]paren
---  - yiiq - [Y]ank [I]nside [I]+1 [Q]uote
+--  - yaNb - [Y]ank [A]round [N]ext [B]racket
+--  - diLf - [D]elete [I]nside [L]ast [F]unction
 --  - ci'  - [C]hange [I]nside [']quote
 require('mini.ai').setup {
-  n_lines = 500,
+  n_lines = 100,
+  silent = true,
+  mappings = {
+    around_next = 'aN',
+    inside_next = 'iN',
+    around_last = 'aL',
+    inside_last = 'iL',
+  },
 }
 
 -- Add/delete/replace surroundings (brackets, quotes, etc.)
