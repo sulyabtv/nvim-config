@@ -6,7 +6,7 @@ require('snacks').setup {
   animate = { enabled = true },
   bigfile = { enabled = true },
   bufdelete = { enabled = true },
-  explorer = { enabled = true, replace_netrw = true },
+  explorer = { enabled = true, replace_netrw = true, trash = false },
   indent = { enabled = true },
   input = { enabled = true },
   lazygit = {

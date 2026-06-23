@@ -80,9 +80,6 @@ vim.o.tabstop = 4
 vim.o.softtabstop = 4
 
 -- code folding
-vim.o.foldmethod = 'expr'
-vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-vim.o.foldlevel = 99 -- start with everything open
 vim.o.foldlevelstart = 99 -- start with everything open
 
 -- rounded borders
