@@ -10,4 +10,4 @@ require('evergarden').setup {
   },
 }
 
-vim.cmd.colorscheme 'evergarden-winter'
+-- vim.cmd.colorscheme 'evergarden-winter'
