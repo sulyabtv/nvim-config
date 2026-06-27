@@ -14,14 +14,19 @@ local parsers = {
   'c',
   'diff',
   'html',
+  'json',
   'latex',
   'lua',
   'luadoc',
   'markdown',
   'markdown_inline',
+  'python',
   'query',
+  'rust',
+  'toml',
   'vim',
   'vimdoc',
+  'yaml',
 }
 require('nvim-treesitter').install(parsers)
 

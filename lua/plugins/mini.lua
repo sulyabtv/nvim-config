@@ -34,7 +34,17 @@ require('mini.ai').setup {
 -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
 -- - sd'   - [S]urround [D]elete [']quotes
 -- - sr)'  - [S]urround [R]eplace [)] [']
-require('mini.surround').setup()
+require('mini.surround').setup {
+  -- remaps to deconflict with leap
+  mappings = {
+    add = 'gza',
+    delete = 'gzd',
+    find = 'gzf',
+    find_left = 'gzF',
+    highlight = 'gzh',
+    replace = 'gzr',
+  },
+}
 
 -- Alt-h/j/k/l to move line or selection
 require('mini.move').setup()

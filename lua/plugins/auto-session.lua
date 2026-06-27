@@ -1,6 +1,6 @@
 vim.pack.add { 'https://github.com/rmagatti/auto-session' }
 
-vim.o.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions'
+vim.o.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal'
 
 require('auto-session').setup {
   post_restore_cmds = { function() Snacks.explorer.open { focus = false } end },

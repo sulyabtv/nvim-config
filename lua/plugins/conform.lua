@@ -42,6 +42,28 @@ require('conform').setup {
     sh = { 'shfmt' },
     ['_'] = { 'trim_whitespace' },
   },
+
+  -- custom formatters
+  formatters = {
+    latexindent_reflow = {
+      command = 'latexindent',
+      args = {
+        '-m',
+        '-y',
+        table.concat({
+          'defaultIndent:"  "',
+          'modifyLineBreaks:oneSentencePerLine:manipulateSentences:1',
+          'modifyLineBreaks:oneSentencePerLine:removeSentenceLineBreaks:0',
+          'modifyLineBreaks:oneSentencePerLine:textWrapSentences:1',
+          'modifyLineBreaks:oneSentencePerLine:sentenceIndent:"  "',
+          'modifyLineBreaks:textWrapOptions:columns:80',
+          'noAdditionalIndent:abstract:1',
+          'noAdditionalIndentGlobal:ifElseFi:1',
+        }, ','),
+      },
+      stdin = true,
+    },
+  },
 }
 
 vim.keymap.set({ 'n', 'v' }, '<leader>F', function() require('conform').format { async = true } end, { desc = 'Format buffer or selection' })

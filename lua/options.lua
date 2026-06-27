@@ -84,3 +84,21 @@ vim.o.foldlevelstart = 99 -- start with everything open
 
 -- rounded borders
 vim.o.winborder = 'rounded'
+
+-- hide tmux statusbar on entry, put it back on exit
+local function tmux_status(state)
+  if not vim.env.TMUX then return end
+  vim.fn.system { 'tmux', 'set-option', 'status', state }
+end
+
+local tmuxgrp = vim.api.nvim_create_augroup('TmuxStatusToggle', { clear = true })
+
+vim.api.nvim_create_autocmd({ 'VimEnter', 'VimResume' }, {
+  group = tmuxgrp,
+  callback = function() tmux_status 'off' end,
+})
+
+vim.api.nvim_create_autocmd({ 'VimLeave', 'VimSuspend' }, {
+  group = tmuxgrp,
+  callback = function() tmux_status 'on' end,
+})

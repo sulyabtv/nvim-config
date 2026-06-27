@@ -12,6 +12,9 @@ require('snacks').setup {
   lazygit = {
     enabled = true,
     configure = true,
+    theme = {
+      inactiveBorderColor = { fg = 'StatusLine' },
+    },
     win = { position = 'float', width = 0.9, height = 0.9 },
   },
   notifier = { enabled = true },
@@ -69,7 +72,7 @@ require('snacks').setup {
       mini_diff_signs = false,
     },
     show = {
-      statusline = true,
+      -- statusline = true,
     },
     win = {
       width = 105,

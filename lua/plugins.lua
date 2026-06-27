@@ -1,4 +1,3 @@
--- Load kickstart plugins
 require 'plugins.guess-indent'
 require 'plugins.nvim-web-devicons'
 require 'plugins.gitsigns'
@@ -9,13 +8,12 @@ require 'plugins.lspconfig'
 require 'plugins.conform'
 require 'plugins.blink-cmp'
 require 'plugins.treesitter'
+require 'plugins.treesitter-textobjects'
 require 'plugins.lint'
 
--- Load additional plugins
 require 'plugins.auto-session'
 require 'plugins.snacks'
 require 'plugins.leap'
-require 'plugins.treesitter-textobjects'
 require 'plugins.noice'
 require 'plugins.markdown-toc'
 require 'plugins.mkdnflow'
@@ -24,5 +22,4 @@ require 'plugins.scrolleof'
 require 'plugins.bufferline'
 require 'plugins.lualine'
 
--- Load additional themes (autoloader)
 require 'themes'

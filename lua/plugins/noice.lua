@@ -23,4 +23,12 @@ require('noice').setup {
     inc_rename = false,
     lsp_doc_border = false,
   },
+  routes = {
+    {
+      -- suppress error msg associated with
+      -- some remote leap operations like yir{<leap>
+      filter = { find = 'remote.lua.*Failed to delete autocmd' },
+      opts = { skip = true },
+    },
+  },
 }
