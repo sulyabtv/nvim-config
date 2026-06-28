@@ -22,6 +22,7 @@ local parsers = {
   'markdown_inline',
   'python',
   'query',
+  'regex',
   'rust',
   'toml',
   'vim',

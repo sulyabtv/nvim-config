@@ -13,7 +13,9 @@ require('snacks').setup {
     enabled = true,
     configure = true,
     theme = {
-      inactiveBorderColor = { fg = 'StatusLine' },
+      activeBorderColor = { fg = 'Special' },
+      inactiveBorderColor = { fg = 'NonText' },
+      optionsTextColor = { fg = 'Field' },
     },
     win = { position = 'float', width = 0.9, height = 0.9 },
   },

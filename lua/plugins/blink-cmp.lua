@@ -55,7 +55,7 @@ require('blink.cmp').setup {
   completion = {
     -- By default, you may press `<c-space>` to show the documentation.
     -- Optionally, set `auto_show = true` to show the documentation after a delay.
-    documentation = { auto_show = false, auto_show_delay_ms = 500 },
+    documentation = { auto_show = true, auto_show_delay_ms = 1000 },
   },
 
   sources = {
@@ -80,7 +80,7 @@ require('blink.cmp').setup {
   fuzzy = { implementation = 'lua' },
 
   -- Shows a signature help window while you type arguments for a function
-  signature = { enabled = true },
+  -- signature = { enabled = true }, -- let noice handle signatures
 }
 
 -- vim: ts=2 sts=2 sw=2 et
