@@ -98,7 +98,7 @@ vim.api.nvim_create_autocmd({ 'VimEnter', 'VimResume' }, {
   callback = function() tmux_status 'off' end,
 })
 
-vim.api.nvim_create_autocmd({ 'VimLeave', 'VimSuspend' }, {
+vim.api.nvim_create_autocmd({ 'VimLeavePre', 'VimSuspend' }, {
   group = tmuxgrp,
   callback = function() tmux_status 'on' end,
 })

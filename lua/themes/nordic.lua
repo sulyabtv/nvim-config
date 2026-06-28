@@ -6,6 +6,7 @@ local P = {}
 require('nordic').setup {
   after_palette = function(palette)
     P.selection_bg = { bg = palette.gray2 }
+    P.selection_bg_light = { bg = palette.gray2 }
     P.dark_bg = { bg = palette.bg_float_border }
     P.dark_fg = { fg = palette.gray1 }
     P.dark = { bg = P.dark_bg.bg, fg = P.dark_fg.fg }
@@ -36,6 +37,10 @@ require('nordic').setup {
     highlights.NoicePopupBorder.bg = P.light.bg
     highlights.NoiceCmdlinePopup.bg = P.light.bg
     highlights.BlinkCmpDoc.bg = P.light.bg
+    -- Fix hover highlighting
+    highlights.LspReferenceRead = P.selection_bg_light
+    highlights.LspReferenceWrite = P.selection_bg_light
+    highlights.LspReferenceText = P.selection_bg_light
   end,
 }
 
