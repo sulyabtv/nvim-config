@@ -102,17 +102,3 @@ vim.api.nvim_create_autocmd({ 'VimLeavePre', 'VimSuspend' }, {
   group = tmuxgrp,
   callback = function() tmux_status 'on' end,
 })
-
--- yank absolute path of current file
-vim.keymap.set('n', '<leader>yp', function()
-  local p = vim.fn.expand '%:p'
-  vim.fn.setreg('+', p)
-  vim.notify(p)
-end, { desc = 'Yank absolute path' })
-
--- yank path relative to cwd
-vim.keymap.set('n', '<leader>yr', function()
-  local p = vim.fn.expand '%:.'
-  vim.fn.setreg('+', p)
-  vim.notify(p)
-end, { desc = 'Yank relative path' })

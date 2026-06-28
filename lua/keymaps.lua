@@ -87,7 +87,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.hl.on_yank() end,
 })
 
--- toggle tmux's status bar to reduce distraction
+-- toggle tmux status bar
 vim.keymap.set('n', '<leader>tx', function()
   if vim.env.TMUX then
     vim.fn.system [[tmux set status #{?status,off,on}]]
@@ -95,6 +95,9 @@ vim.keymap.set('n', '<leader>tx', function()
     vim.notify('Not in a tmux session', vim.log.levels.WARN)
   end
 end, { desc = 'Toggle tmux status bar' })
+
+-- toggle neovim statusline
+vim.keymap.set('n', '<leader>ts', function() vim.o.laststatus = vim.o.laststatus == 0 and 3 or 0 end, { desc = 'Toggle statusline' })
 
 vim.keymap.set('n', '<C-c>', '<cmd>%y+<cr>', { desc = 'Copy whole file to clipboard' })
 
@@ -127,3 +130,17 @@ vim.keymap.set('n', '<leader>pd', function()
     end
   end)
 end, { desc = 'Delete an inactive plugin' })
+
+-- yank absolute path of current file
+vim.keymap.set('n', '<leader>yp', function()
+  local p = vim.fn.expand '%:p'
+  vim.fn.setreg('+', p)
+  vim.notify(p)
+end, { desc = 'Yank absolute path' })
+
+-- yank path relative to cwd
+vim.keymap.set('n', '<leader>yr', function()
+  local p = vim.fn.expand '%:.'
+  vim.fn.setreg('+', p)
+  vim.notify(p)
+end, { desc = 'Yank relative path' })

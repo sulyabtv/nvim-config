@@ -30,6 +30,10 @@
       "rev": "6a47a90e5caf1b21e54ff7967017c255bab80fdd",
       "src": "https://codeberg.org/evergarden/nvim.git"
     },
+    "friendly-snippets": {
+      "rev": "6cd7280adead7f586db6fccbd15d2cac7e2188b9",
+      "src": "https://github.com/rafamadriz/friendly-snippets"
+    },
     "gitsigns.nvim": {
       "rev": "2038c666bd9d8a0b7349a0b6ee00dc83104b9ecf",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
