@@ -74,7 +74,8 @@ vim.o.scrolloff = 999
 -- instead raise a dialog asking if you wish to save the current file(s)
 vim.o.confirm = true
 
--- tab size
+-- tab config
+vim.o.expandtab = true -- use spaces unless overridden per filetype
 vim.o.shiftwidth = 4
 vim.o.tabstop = 4
 vim.o.softtabstop = 4

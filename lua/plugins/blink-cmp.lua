@@ -13,6 +13,11 @@ require('luasnip').setup {}
 vim.pack.add { gh 'rafamadriz/friendly-snippets' }
 require('luasnip.loaders.from_vscode').lazy_load()
 
+-- load my own snippets
+require('luasnip.loaders.from_lua').lazy_load {
+  paths = { vim.fn.stdpath 'config' .. '/lua/snip' },
+}
+
 -- [[ Autocomplete Engine ]]
 vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
 require('blink.cmp').setup {
@@ -63,6 +68,20 @@ require('blink.cmp').setup {
       mkdnflow = {
         name = 'Mkdnflow',
         module = 'mkdnflow.completion.blink',
+      },
+      snippets = {
+        -- TODO: Remove this hack once friendly-snippets fixes their duplication
+        transform_items = function(_, items)
+          local seen, out = {}, {}
+          for _, item in ipairs(items) do
+            local key = item.insertText or item.label
+            if not seen[key] then
+              seen[key] = true
+              out[#out + 1] = item
+            end
+          end
+          return out
+        end,
       },
     },
   },
