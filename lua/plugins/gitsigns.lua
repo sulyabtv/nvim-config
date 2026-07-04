@@ -50,10 +50,11 @@ require('gitsigns').setup {
     map('n', '<leader>gp', gitsigns.preview_hunk, { desc = 'git preview hunk' })
     map('n', '<leader>gA', gitsigns.stage_buffer, { desc = 'git stage buffer' })
     map('n', '<leader>gR', gitsigns.reset_buffer, { desc = 'git reset buffer' })
-    map('n', '<leader>gb', function() gitsigns.blame_line { full = true } end, { desc = 'git blame line' })
+    map('n', '<leader>gb', function() gitsigns.blame() end, { desc = 'git blame' })
     -- Toggles
     map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = 'Toggle git blame line' })
     map('n', '<leader>tw', gitsigns.toggle_word_diff, { desc = 'Toggle git word diff' })
+    map('n', '<leader>tm', gitsigns.toggle_signs, { desc = 'Toggle margin line change indicator' })
 
     -- Text object
     map({ 'o', 'x' }, 'ih', gitsigns.select_hunk)

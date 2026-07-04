@@ -10,33 +10,6 @@ vim.keymap.set({ 'n', 'i', 'v' }, '<C-s>', '<cmd>w<cr><Esc>', { desc = 'Save and
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- -- fancier: make Esc do Esc-y things
--- vim.keymap.set('n', '<Esc>', function()
---   -- no floats => clear search highlight if active
---   if vim.v.hlsearch == 1 then
---     vim.cmd 'noh'
---     return
---   end
---   -- ugly hack to not exit zenmode accidentally
---   -- pre-scan: find zenmode-bg, mark its window id and id+1
---   local skip = {}
---   for _, win in ipairs(vim.api.nvim_list_wins()) do
---     if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == 'zenmode-bg' then
---       skip[win] = true
---       skip[win + 1] = true
---     end
---   end
---   -- close the first float that isn't marked
---   for _, win in ipairs(vim.api.nvim_list_wins()) do
---     if not skip[win] then
---       if vim.api.nvim_win_get_config(win).relative ~= '' then
---         vim.api.nvim_win_close(win, false)
---         return
---       end
---     end
---   end
--- end, { desc = 'Close float or clear highlight' })
-
 -- Keep selection after indenting in visual mode
 vim.keymap.set('v', '<', '<gv', { desc = 'Indent left' })
 vim.keymap.set('v', '>', '>gv', { desc = 'Indent right' })
@@ -101,12 +74,6 @@ vim.keymap.set('n', '<leader>ts', function() vim.o.laststatus = vim.o.laststatus
 
 vim.keymap.set('n', '<C-c>', '<cmd>%y+<cr>', { desc = 'Copy whole file to clipboard' })
 
--- shortcut to insert today's date
-vim.keymap.set('n', '<leader>md', function()
-  local date = tostring(os.date '%Y-%m-%d')
-  vim.api.nvim_put({ date }, 'c', true, true)
-end, { desc = 'Insert current date' })
-
 -- vim pack shortcuts
 vim.keymap.set('n', '<leader>pu', function() vim.pack.update(nil, { force = true }) end, { desc = 'Pack: update plugins' })
 vim.keymap.set('n', '<leader>pl', function() vim.pack.update(nil, { offline = true }) end, { desc = 'Pack: list installed plugins' })
@@ -144,3 +111,6 @@ vim.keymap.set('n', '<leader>yr', function()
   vim.fn.setreg('+', p)
   vim.notify(p)
 end, { desc = 'Yank relative path' })
+
+-- close current tabpage
+vim.keymap.set('n', '<leader>tc', '<Cmd>tabclose<CR>', { desc = 'Close tab' })

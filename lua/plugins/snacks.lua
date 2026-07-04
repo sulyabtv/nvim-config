@@ -2,6 +2,9 @@ vim.pack.add {
   'https://github.com/folke/snacks.nvim',
 }
 
+-- did we toggle gitsigns margin indicator on zen entry?
+local gs_toggle_on_exit = false
+
 require('snacks').setup {
   animate = { enabled = true },
   bigfile = { enabled = true },
@@ -83,6 +86,29 @@ require('snacks').setup {
         blend = 99, -- but use the bg color
       },
     },
+    on_open = function()
+      vim.schedule(function()
+        -- fix for which-key sometimes not working in zen mode
+        -- re-arm which-key's triggers for the new zen window
+        pcall(function() require('which-key.state').setup() end)
+        -- turn off gitsigns margin change indicator if not already off
+        local gs = require 'gitsigns'
+        local is_on = require('gitsigns.config').config.signcolumn
+        if is_on then
+          gs.toggle_signs(false)
+          gs_toggle_on_exit = true
+        else
+          gs_toggle_on_exit = false
+        end
+      end)
+    end,
+    on_close = function()
+      -- re-enable gitsigns margin change indicator if needed
+      if gs_toggle_on_exit then
+        require('gitsigns').toggle_signs(true)
+        gs_toggle_on_exit = false
+      end
+    end,
   },
 }
 
@@ -113,7 +139,7 @@ vim.keymap.set('n', '<leader>gll', function() Snacks.picker.git_log_line { cwd =
 vim.keymap.set('n', '<leader>gs', function() Snacks.picker.git_status { cwd = file_dir() } end, { desc = 'Git status' })
 vim.keymap.set('n', '<leader>gS', function() Snacks.picker.git_stash { cwd = file_dir() } end, { desc = 'Git stash' })
 vim.keymap.set('n', '<leader>gc', function() Snacks.picker.git_log { cwd = file_dir() } end, { desc = 'Git commits' })
-vim.keymap.set('n', '<leader>gb', function() Snacks.picker.git_branches { cwd = file_dir() } end, { desc = 'Git branches' })
+vim.keymap.set('n', '<leader>gB', function() Snacks.picker.git_branches { cwd = file_dir() } end, { desc = 'Git branches' })
 
 -- lsp stuff
 vim.keymap.set('n', '<leader>ls', function() Snacks.picker.lsp_symbols() end, { desc = 'Document symbols' })
