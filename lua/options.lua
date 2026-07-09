@@ -103,3 +103,26 @@ vim.api.nvim_create_autocmd({ 'VimLeavePre', 'VimSuspend' }, {
   group = tmuxgrp,
   callback = function() tmux_status 'on' end,
 })
+
+-- hack to hide the winseparator between explorer sidebar and editor
+local function hide_layoutbox_sep()
+  -- what bg does the editor use?
+  local normal = vim.api.nvim_get_hl(0, { name = 'Normal' })
+  local bg = normal.bg
+  if not bg then return end
+
+  vim.api.nvim_set_hl(0, 'WinSeparatorHidden', { fg = bg, bg = bg })
+
+  for _, w in ipairs(vim.api.nvim_list_wins()) do
+    if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == 'snacks_layout_box' then
+      local wh = vim.wo[w].winhighlight
+      if not wh:find('WinSeparator:WinSeparatorHidden', 1, true) then
+        vim.wo[w].winhighlight = (wh ~= '' and wh .. ',' or '') .. 'WinSeparator:WinSeparatorHidden'
+      end
+    end
+  end
+end
+
+vim.api.nvim_create_autocmd({ 'WinResized', 'ColorScheme' }, {
+  callback = function() vim.schedule(hide_layoutbox_sep) end,
+})

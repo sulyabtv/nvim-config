@@ -27,6 +27,10 @@ bufferline.setup {
 vim.keymap.set('n', '<Tab>', '<cmd>BufferLineCycleNext<cr>', { desc = 'Next buffer' })
 vim.keymap.set('n', '<S-Tab>', '<cmd>BufferLineCyclePrev<cr>', { desc = 'Prev buffer' })
 
+-- buffer move
+vim.keymap.set('n', '<leader>]', '<cmd>BufferLineMoveNext<cr>', { desc = 'Swap with next buffer' })
+vim.keymap.set('n', '<leader>[', '<cmd>BufferLineMovePrev<cr>', { desc = 'Swap with prev buffer' })
+
 -- buffer navigation
 vim.keymap.set('n', '<leader>bg', '<cmd>BufferLinePick<cr>', { desc = 'Pick buffer to go to' })
 vim.keymap.set('n', '<leader>bc', '<cmd>BufferLinePickClose<cr>', { desc = 'Pick buffer to close' })
