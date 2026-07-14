@@ -124,5 +124,7 @@ local function hide_layoutbox_sep()
 end
 
 vim.api.nvim_create_autocmd({ 'WinResized', 'ColorScheme' }, {
-  callback = function() vim.schedule(hide_layoutbox_sep) end,
+  callback = function()
+    vim.schedule(function() pcall(hide_layoutbox_sep) end)
+  end,
 })
