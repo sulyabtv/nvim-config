@@ -80,9 +80,6 @@ vim.o.shiftwidth = 4
 vim.o.tabstop = 4
 vim.o.softtabstop = 4
 
--- code folding
-vim.o.foldlevelstart = 99 -- start with everything open
-
 -- rounded borders
 vim.o.winborder = 'rounded'
 
@@ -114,10 +111,13 @@ local function hide_layoutbox_sep()
   vim.api.nvim_set_hl(0, 'WinSeparatorHidden', { fg = bg, bg = bg })
 
   for _, w in ipairs(vim.api.nvim_list_wins()) do
-    if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == 'snacks_layout_box' then
-      local wh = vim.wo[w].winhighlight
-      if not wh:find('WinSeparator:WinSeparatorHidden', 1, true) then
-        vim.wo[w].winhighlight = (wh ~= '' and wh .. ',' or '') .. 'WinSeparator:WinSeparatorHidden'
+    if vim.api.nvim_win_is_valid(w) then
+      local ok, buf = pcall(vim.api.nvim_win_get_buf, w)
+      if ok and vim.bo[buf].filetype == 'snacks_layout_box' then
+        local wh = vim.wo[w].winhighlight
+        if not wh:find('WinSeparator:WinSeparatorHidden', 1, true) then
+          pcall(function() vim.wo[w].winhighlight = (wh ~= '' and wh .. ',' or '') .. 'WinSeparator:WinSeparatorHidden' end)
+        end
       end
     end
   end
@@ -128,3 +128,6 @@ vim.api.nvim_create_autocmd({ 'WinResized', 'ColorScheme' }, {
     vim.schedule(function() pcall(hide_layoutbox_sep) end)
   end,
 })
+
+vim.opt.conceallevel = 2
+vim.opt.concealcursor = 'nc'

@@ -44,15 +44,6 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- Double Esc to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
---  Use CTRL+<hjkl> to switch between windows
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
--- Use CTRL+p to switch to the previous window
-vim.keymap.set('n', '<C-p>', '<C-w><C-p>', { desc = 'Move focus to the last focused window' })
-
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
@@ -114,3 +105,26 @@ end, { desc = 'Yank relative path' })
 
 -- close current tabpage
 vim.keymap.set('n', '<leader>tc', '<Cmd>tabclose<CR>', { desc = 'Close tab' })
+
+-- Tab to toggle fold
+---@diagnostic disable-next-line: param-type-mismatch
+vim.keymap.set('n', '<Tab>', function() pcall(vim.cmd, 'normal! za') end, { desc = 'Toggle fold' })
+
+local function next_closed_fold(direction)
+  local cmd = (direction == 'forward') and 'zj' or 'zk'
+  local start_line, start_col = vim.fn.line '.', vim.fn.col '.'
+  for _ = 1, 1000 do
+    local before = vim.fn.line '.'
+    vim.cmd('normal! ' .. cmd)
+    local after = vim.fn.line '.'
+    if before == after then
+      vim.fn.cursor(start_line, start_col)
+      vim.notify('No more closed folds', vim.log.levels.INFO)
+      return
+    end
+    if vim.fn.foldclosed '.' ~= -1 then return end
+  end
+end
+
+vim.keymap.set('n', ']Z', function() next_closed_fold 'forward' end, { desc = 'Next closed fold' })
+vim.keymap.set('n', '[Z', function() next_closed_fold 'backward' end, { desc = 'Prev closed fold' })

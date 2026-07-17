@@ -14,6 +14,7 @@ require('conform').setup {
       rust = true,
       json = true,
       jsonc = true,
+      org = 'trim_whitespace',
       tex = 'trim_whitespace', -- for latex, only trim whitespace on save
       sh = true,
     }

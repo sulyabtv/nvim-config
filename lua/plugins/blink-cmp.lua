@@ -63,11 +63,25 @@ require('blink.cmp').setup {
   },
 
   sources = {
-    default = { 'lsp', 'path', 'snippets', 'mkdnflow' },
+    default = { 'lsp', 'path', 'snippets', 'buffer' },
+    per_filetype = {
+      markdown = { inherit_defaults = true, 'mkdnflow' },
+      org = { 'orgmode', 'path', 'snippets', 'buffer' }, -- no lsp
+    },
     providers = {
       mkdnflow = {
         name = 'Mkdnflow',
         module = 'mkdnflow.completion.blink',
+      },
+      orgmode = {
+        name = 'Orgmode',
+        module = 'orgmode.org.autocompletion.blink',
+      },
+      buffer = {
+        -- constraints to reduce noise
+        score_offset = -3,
+        max_items = 5,
+        min_keyword_length = 3,
       },
       snippets = {
         -- TODO: Remove this hack once friendly-snippets fixes their duplication

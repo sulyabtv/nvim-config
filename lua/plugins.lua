@@ -21,5 +21,7 @@ require 'plugins.vimtex'
 require 'plugins.scrolleof'
 require 'plugins.bufferline'
 require 'plugins.lualine'
+require 'plugins.nvim-orgmode'
+require 'plugins.window-picker'
 
 require 'themes'

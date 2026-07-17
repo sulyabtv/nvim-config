@@ -32,7 +32,9 @@ local parsers = {
 require('nvim-treesitter').install(parsers)
 
 -- Do *not* use treesitter for the following languages
-local overrides = {}
+local overrides = {
+  'org',
+}
 
 ---@param buf integer
 ---@param language string

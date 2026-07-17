@@ -14,8 +14,10 @@ require('nordic').setup {
     P.light_fg = { fg = palette.blue1 }
     P.light = { bg = P.light_bg.bg, fg = P.light_fg.fg }
     P.light_bg_only = { bg = P.light_bg.bg, fg = P.light_bg.bg }
+    P.comment = { fg = palette.gray5 }
 
     palette.bg_visual = P.selection_bg.bg
+    palette.comment = P.comment.fg
     vim.api.nvim_set_hl(0, 'SnacksPickerInputBorder', P.dark)
     vim.api.nvim_set_hl(0, 'SnacksPickerListBorder', P.dark)
     vim.api.nvim_set_hl(0, 'SnacksPickerPreviewBorder', P.dark)
