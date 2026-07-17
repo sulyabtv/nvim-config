@@ -8,6 +8,10 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- What to save when saving session/view
+vim.o.sessionoptions = 'blank,buffers,curdir,folds,globals,help,tabpages,winsize,winpos,terminal'
+vim.o.viewoptions = 'cursor,folds'
+
 -- Make line numbers default in normal mode if focused
 vim.o.number = true
 vim.o.relativenumber = true
@@ -131,3 +135,27 @@ vim.api.nvim_create_autocmd({ 'WinResized', 'ColorScheme' }, {
 
 vim.opt.conceallevel = 2
 vim.opt.concealcursor = 'nc'
+
+-- code folding
+vim.o.foldlevelstart = 1 -- start with all but outermost fold closed
+
+-- remember folds when switching between buffers
+local group = vim.api.nvim_create_augroup('remember-folds', { clear = true })
+
+vim.api.nvim_create_autocmd({ 'BufWinLeave' }, {
+  group = group,
+  pattern = '?*', -- only real, named buffers
+  callback = function()
+    if vim.bo.buftype == '' then -- skip special buffers (help, terminal, quickfix, etc.)
+      pcall(vim.cmd.mkview)
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
+  group = group,
+  pattern = '?*',
+  callback = function()
+    if vim.bo.buftype == '' then pcall(vim.cmd.loadview) end
+  end,
+})

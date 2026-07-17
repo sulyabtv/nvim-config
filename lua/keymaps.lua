@@ -104,7 +104,7 @@ vim.keymap.set('n', '<leader>yr', function()
 end, { desc = 'Yank relative path' })
 
 -- close current tabpage
-vim.keymap.set('n', '<leader>tc', '<Cmd>tabclose<CR>', { desc = 'Close tab' })
+vim.keymap.set('n', '<leader>xt', '<Cmd>tabclose<CR>', { desc = 'Close current tab' })
 
 -- Tab to toggle fold
 ---@diagnostic disable-next-line: param-type-mismatch
