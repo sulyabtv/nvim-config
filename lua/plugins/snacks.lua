@@ -173,33 +173,7 @@ vim.keymap.set('n', '<leader>S', function() Snacks.scratch.select() end, { desc 
 vim.keymap.set('n', '<leader>tt', function() Snacks.terminal.toggle() end, { desc = 'Toggle terminal' })
 
 -- explorer
-vim.keymap.set('n', '<leader>E', function() Snacks.explorer.open { focus = false } end, { desc = 'Toggle explorer pane' })
-local last_win = nil -- remembers last window to jump back to from explorer
-vim.keymap.set('n', '<leader>e', function()
-  -- if in zen mode, exit (explorer is hidden in zen mode)
-  local win = Snacks.zen.win
-  if win and win:valid() then win:close() end
-
-  -- check the explorer state
-  local explorer = Snacks.picker.get({ source = 'explorer' })[1]
-
-  if explorer == nil then
-    -- no explorer => open
-    last_win = vim.api.nvim_get_current_win()
-    Snacks.picker.explorer()
-  elseif explorer:is_focused() then
-    -- we're in the explorer => jump back to where we came from
-    if last_win and vim.api.nvim_win_is_valid(last_win) then
-      vim.api.nvim_set_current_win(last_win)
-    else
-      vim.cmd.wincmd 'p' -- fallback if that window is gone
-    end
-  else
-    -- we are not in explorer => switch to it
-    last_win = vim.api.nvim_get_current_win()
-    explorer:focus 'list'
-  end
-end, { desc = 'Focus explorer pane' })
+vim.keymap.set('n', '<leader>e', function() Snacks.explorer.open { focus = false } end, { desc = 'Toggle explorer pane' })
 
 -- zen
 vim.keymap.set('n', '<leader>z', function() Snacks.zen.zen() end, { desc = 'Toggle Zen mode' })

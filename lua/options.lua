@@ -87,24 +87,6 @@ vim.o.softtabstop = 4
 -- rounded borders
 vim.o.winborder = 'rounded'
 
--- hide tmux statusbar on entry, put it back on exit
-local function tmux_status(state)
-  if not vim.env.TMUX then return end
-  vim.fn.system { 'tmux', 'set-option', 'status', state }
-end
-
-local tmuxgrp = vim.api.nvim_create_augroup('TmuxStatusToggle', { clear = true })
-
-vim.api.nvim_create_autocmd({ 'VimEnter', 'VimResume' }, {
-  group = tmuxgrp,
-  callback = function() tmux_status 'off' end,
-})
-
-vim.api.nvim_create_autocmd({ 'VimLeavePre', 'VimSuspend' }, {
-  group = tmuxgrp,
-  callback = function() tmux_status 'on' end,
-})
-
 -- hack to hide the winseparator between explorer sidebar and editor
 local function hide_layoutbox_sep()
   -- what bg does the editor use?
@@ -133,6 +115,7 @@ vim.api.nvim_create_autocmd({ 'WinResized', 'ColorScheme' }, {
   end,
 })
 
+-- conceal links, etc.
 vim.opt.conceallevel = 2
 vim.opt.concealcursor = 'nc'
 

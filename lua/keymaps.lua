@@ -128,3 +128,38 @@ end
 
 vim.keymap.set('n', ']Z', function() next_closed_fold 'forward' end, { desc = 'Next closed fold' })
 vim.keymap.set('n', '[Z', function() next_closed_fold 'backward' end, { desc = 'Prev closed fold' })
+
+-- (Hopefully) better semantics for { / }
+local function prev_paragraph_start()
+  local prev_line = vim.fn.line '.' - 1
+  local prev_is_blank = prev_line == 0 or vim.fn.getline(prev_line):match '^%s*$'
+
+  if prev_is_blank then
+    -- At first line of paragraph (or line 1). Jump to previous paragraph.
+    vim.cmd 'normal! {'
+    while vim.fn.line '.' > 1 and vim.fn.getline('.'):match '^%s*$' do
+      vim.cmd 'normal! k'
+    end
+    -- Now on last line of previous paragraph; walk to its first line.
+    while vim.fn.line '.' > 1 and not vim.fn.getline(vim.fn.line '.' - 1):match '^%s*$' do
+      vim.cmd 'normal! k'
+    end
+  else
+    -- Mid-paragraph. Walk up to first line of current paragraph.
+    while vim.fn.line '.' > 1 and not vim.fn.getline(vim.fn.line '.' - 1):match '^%s*$' do
+      vim.cmd 'normal! k'
+    end
+  end
+  vim.cmd 'normal! ^'
+end
+
+local function next_paragraph_start()
+  vim.cmd 'normal! }'
+  while vim.fn.line '.' < vim.fn.line '$' and vim.fn.getline('.'):match '^%s*$' do
+    vim.cmd 'normal! j'
+  end
+  vim.cmd 'normal! ^'
+end
+
+vim.keymap.set({ 'n', 'x', 'o' }, '}', next_paragraph_start, { desc = 'Next paragraph start' })
+vim.keymap.set({ 'n', 'x', 'o' }, '{', prev_paragraph_start, { desc = 'Prev paragraph start' })

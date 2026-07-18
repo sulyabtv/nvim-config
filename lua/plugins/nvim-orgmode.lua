@@ -7,8 +7,8 @@ vim.pack.add {
 local Menu = require 'org-modern.menu'
 
 require('orgmode').setup {
-  org_agenda_files = '~/icloud/syncthing/**/*',
-  org_default_notes_file = '~/icloud/syncthing/uncategorized.org',
+  org_agenda_files = '~/syncthing/**/*',
+  org_default_notes_file = '~/syncthing/uncategorized.org',
   org_startup_indented = true,
   org_startup_folded = 'content',
   org_hide_emphasis_markers = true,
@@ -34,9 +34,6 @@ require('orgmode').setup {
       handler = function(data) Menu:new():open(data) end,
     },
     input = { use_vim_ui = true },
-  },
-  mappings = {
-    org = {},
   },
 }
 -- Experimental LSP support
