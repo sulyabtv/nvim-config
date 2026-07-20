@@ -167,7 +167,7 @@ vim.keymap.set('n', '<leader>pr', function() Snacks.picker.resume() end, { desc 
 vim.keymap.set('n', '<leader>pp', function() Snacks.picker.pickers() end, { desc = 'Show all pickers' })
 
 -- general
-vim.keymap.set('n', '<leader>xb', function() Snacks.bufdelete() end, { desc = 'Close current buffer' })
+vim.keymap.set('n', '<leader>xx', function() Snacks.bufdelete() end, { desc = 'Close current buffer' })
 vim.keymap.set('n', '<leader>.', function() Snacks.scratch() end, { desc = 'Toggle scratch buffer' })
 vim.keymap.set('n', '<leader>S', function() Snacks.scratch.select() end, { desc = 'Select scratch buffer' })
 vim.keymap.set('n', '<leader>tt', function() Snacks.terminal.toggle() end, { desc = 'Toggle terminal' })

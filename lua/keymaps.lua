@@ -106,6 +106,7 @@ end, { desc = 'Yank relative path' })
 -- close current tabpage/window
 vim.keymap.set('n', '<leader>xt', '<Cmd>tabclose<CR>', { desc = 'Close current tab' })
 vim.keymap.set('n', '<leader>xw', '<Cmd>close<CR>', { desc = 'Close current window' })
+vim.keymap.set('n', '<leader>xn', '<Cmd>qa<CR>', { desc = 'Close Neovim' })
 
 -- Tab to toggle fold
 ---@diagnostic disable-next-line: param-type-mismatch
@@ -134,7 +135,6 @@ vim.keymap.set('n', '[Z', function() next_closed_fold 'backward' end, { desc = '
 local function prev_paragraph_start()
   local prev_line = vim.fn.line '.' - 1
   local prev_is_blank = prev_line == 0 or vim.fn.getline(prev_line):match '^%s*$'
-
   if prev_is_blank then
     -- At first line of paragraph (or line 1). Jump to previous paragraph.
     vim.cmd 'normal! {'
@@ -155,6 +155,15 @@ local function prev_paragraph_start()
 end
 
 local function next_paragraph_start()
+  -- On a blank: walk down to first non-blank, which is the next paragraph's start.
+  if vim.fn.getline('.'):match '^%s*$' then
+    while vim.fn.line '.' < vim.fn.line '$' and vim.fn.getline('.'):match '^%s*$' do
+      vim.cmd 'normal! j'
+    end
+    vim.cmd 'normal! ^'
+    return
+  end
+  -- Not on blank
   vim.cmd 'normal! }'
   while vim.fn.line '.' < vim.fn.line '$' and vim.fn.getline('.'):match '^%s*$' do
     vim.cmd 'normal! j'
@@ -162,5 +171,46 @@ local function next_paragraph_start()
   vim.cmd 'normal! ^'
 end
 
+local function next_paragraph_end()
+  local next_line = vim.fn.line '.' + 1
+  local next_is_blank = next_line > vim.fn.line '$' or vim.fn.getline(next_line):match '^%s*$'
+  if next_is_blank then
+    -- At last line of paragraph (or last line of file). Jump to next paragraph.
+    vim.cmd 'normal! }'
+    while vim.fn.line '.' < vim.fn.line '$' and vim.fn.getline('.'):match '^%s*$' do
+      vim.cmd 'normal! j'
+    end
+    -- Now on first line of next paragraph; walk to its last line.
+    while vim.fn.line '.' < vim.fn.line '$' and not vim.fn.getline(vim.fn.line '.' + 1):match '^%s*$' do
+      vim.cmd 'normal! j'
+    end
+  else
+    -- Mid-paragraph. Walk down to last line of current paragraph.
+    while vim.fn.line '.' < vim.fn.line '$' and not vim.fn.getline(vim.fn.line '.' + 1):match '^%s*$' do
+      vim.cmd 'normal! j'
+    end
+  end
+  vim.cmd 'normal! ^'
+end
+
+local function prev_paragraph_end()
+  -- On a blank: walk up to first non-blank, which is the previous paragraph's end.
+  if vim.fn.getline('.'):match '^%s*$' then
+    while vim.fn.line '.' > 1 and vim.fn.getline('.'):match '^%s*$' do
+      vim.cmd 'normal! k'
+    end
+    vim.cmd 'normal! ^'
+    return
+  end
+  -- Not on blank
+  vim.cmd 'normal! {'
+  while vim.fn.line '.' > 1 and vim.fn.getline('.'):match '^%s*$' do
+    vim.cmd 'normal! k'
+  end
+  vim.cmd 'normal! ^'
+end
+
 vim.keymap.set({ 'n', 'x', 'o' }, '}', next_paragraph_start, { desc = 'Next paragraph start' })
 vim.keymap.set({ 'n', 'x', 'o' }, '{', prev_paragraph_start, { desc = 'Prev paragraph start' })
+vim.keymap.set({ 'n', 'x', 'o' }, 'g}', next_paragraph_end, { desc = 'Next paragraph end' })
+vim.keymap.set({ 'n', 'x', 'o' }, 'g{', prev_paragraph_end, { desc = 'Prev paragraph end' })

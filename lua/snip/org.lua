@@ -16,7 +16,7 @@ return {
     i(1, 'title'),
     t { '', ':PROPERTIES:', ':DATE: [' },
     f(today '%Y-%m-%d %a', {}),
-    t { ']', ':END:', '' },
+    t { ']', ':END:', '', '' },
     i(0),
   }),
 }

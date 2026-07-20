@@ -9,6 +9,7 @@ local Menu = require 'org-modern.menu'
 require('orgmode').setup {
   org_agenda_files = '~/syncthing/**/*',
   org_default_notes_file = '~/syncthing/uncategorized.org',
+
   org_startup_indented = true,
   org_startup_folded = 'content',
   org_hide_emphasis_markers = true,
@@ -16,9 +17,15 @@ require('orgmode').setup {
   org_blank_before_new_entry = { heading = false, plain_list_item = false },
   org_cycle_separator_lines = 1,
   org_id_link_to_org_use_id = true,
+  org_log_into_drawer = 'LOGBOOK',
+  org_agenda_hide_empty_blocks = true,
+  org_agenda_text_search_extra_files = { 'agenda-archives' },
+  org_agenda_span = 'day',
+
   org_priority_highest = 'A',
   org_priority_lowest = 'E',
   org_priority_default = 'C',
+
   org_todo_keywords = {
     'TODO(t)',
     'PROGRESS(p)',
@@ -28,6 +35,50 @@ require('orgmode').setup {
     'DELEGATED(l)',
     'CANCELED(c)',
   },
+
+  org_agenda_custom_commands = {
+    o = {
+      description = 'Overdue',
+      types = {
+        {
+          type = 'tags_todo',
+          match = 'DEADLINE<"<today>"|SCHEDULED<"<today>"',
+          org_agenda_overriding_header = 'Overdue',
+          -- merge with agenda view if these can be excluded from it
+        },
+      },
+    },
+    n = {
+      description = 'Notes',
+      types = {
+        {
+          type = 'tags',
+          match = '+note+DATE<"<+1d>"',
+          org_agenda_overriding_header = 'Notes',
+          -- would be nice to sort by note date or alphabetically
+        },
+      },
+    },
+    t = {
+      description = 'Meetings',
+      types = {
+        {
+          type = 'tags',
+          match = '+meeting+DATE<"<+1d>"',
+          org_agenda_overriding_header = 'Meetings',
+          -- would be nice to sort by note date or alphabetically
+        },
+      },
+    },
+  },
+
+  org_capture_templates = {
+    c = {
+      description = 'Generic',
+      template = '* %?',
+    },
+  },
+
   ui = {
     menu = {
       ---@diagnostic disable-next-line: redundant-parameter
