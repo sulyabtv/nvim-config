@@ -75,6 +75,7 @@ require('snacks').setup {
       dim = false,
       git_signs = false,
       mini_diff_signs = false,
+      line_number = false,
     },
     show = {
       -- statusline = true,

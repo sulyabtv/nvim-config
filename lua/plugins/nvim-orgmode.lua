@@ -79,6 +79,16 @@ require('orgmode').setup {
     },
   },
 
+  mappings = {
+    org = {
+      org_next_visible_heading = ']]',
+      org_previous_visible_heading = '[[',
+      org_forward_heading_same_level = ']h',
+      org_backward_heading_same_level = '[h',
+      outline_up_heading = '[p',
+    },
+  },
+
   ui = {
     menu = {
       ---@diagnostic disable-next-line: redundant-parameter
