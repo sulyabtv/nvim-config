@@ -59,13 +59,24 @@ require('orgmode').setup {
         },
       },
     },
-    t = {
+    x = {
       description = 'Meetings',
       types = {
         {
           type = 'tags',
           match = '+meeting+DATE<"<+1d>"',
           org_agenda_overriding_header = 'Meetings',
+          -- would be nice to sort by note date or alphabetically
+        },
+      },
+    },
+    t = {
+      description = 'Talks',
+      types = {
+        {
+          type = 'tags',
+          match = '+talk+DATE<"<+1d>"|+conference',
+          org_agenda_overriding_header = 'Talks',
           -- would be nice to sort by note date or alphabetically
         },
       },

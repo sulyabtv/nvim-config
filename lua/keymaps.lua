@@ -132,81 +132,89 @@ vim.keymap.set('n', ']Z', function() next_closed_fold 'forward' end, { desc = 'N
 vim.keymap.set('n', '[Z', function() next_closed_fold 'backward' end, { desc = 'Prev closed fold' })
 
 -- (Hopefully) better semantics for { / }
-local function prev_paragraph_start()
-  local prev_line = vim.fn.line '.' - 1
-  local prev_is_blank = prev_line == 0 or vim.fn.getline(prev_line):match '^%s*$'
-  if prev_is_blank then
-    -- At first line of paragraph (or line 1). Jump to previous paragraph.
-    vim.cmd 'normal! {'
-    while vim.fn.line '.' > 1 and vim.fn.getline('.'):match '^%s*$' do
-      vim.cmd 'normal! k'
-    end
-    -- Now on last line of previous paragraph; walk to its first line.
-    while vim.fn.line '.' > 1 and not vim.fn.getline(vim.fn.line '.' - 1):match '^%s*$' do
-      vim.cmd 'normal! k'
-    end
-  else
-    -- Mid-paragraph. Walk up to first line of current paragraph.
-    while vim.fn.line '.' > 1 and not vim.fn.getline(vim.fn.line '.' - 1):match '^%s*$' do
-      vim.cmd 'normal! k'
+local function is_paragraph_end(row, total) return not vim.fn.getline(row):match '^%s*$' and (row == total or vim.fn.getline(row + 1):match '^%s*$') end
+
+local function is_paragraph_start(row) return not vim.fn.getline(row):match '^%s*$' and (row == 1 or vim.fn.getline(row - 1):match '^%s*$') end
+
+local function advance(row, direction)
+  local total = vim.fn.line '$'
+  local function clamp(n) return math.max(1, math.min(n, total)) end
+
+  local next_row = clamp(row + direction)
+  local fold_start = vim.fn.foldclosed(next_row)
+
+  if fold_start == -1 then return next_row end -- not in a fold
+
+  if row == fold_start then
+    if direction > 0 then
+      local fold_end = vim.fn.foldclosedend(next_row)
+      if fold_end == total then return row end -- do not move if the fold covers the last line
+      return fold_end + 1
+    else
+      if fold_start == 1 then return row end -- do not move if the fold covers the first line
+      return fold_start - 1
     end
   end
+
+  return fold_start
+end
+
+local function next_paragraph_end()
+  local total = vim.fn.line '$'
+  local row = vim.fn.line '.'
+
+  -- if we are at the end of a paragraph move down one line
+  if row < total and is_paragraph_end(row, total) then row = advance(row, 1) end
+  -- keep moving down until we reach the end of a paragraph
+  while row < total and (vim.fn.getline(row):match '^%s*$' or not vim.fn.getline(row + 1):match '^%s*$') do
+    row = advance(row, 1)
+  end
+
+  vim.api.nvim_win_set_cursor(0, { row, 0 })
   vim.cmd 'normal! ^'
 end
 
 local function next_paragraph_start()
-  -- On a blank: walk down to first non-blank, which is the next paragraph's start.
-  if vim.fn.getline('.'):match '^%s*$' then
-    while vim.fn.line '.' < vim.fn.line '$' and vim.fn.getline('.'):match '^%s*$' do
-      vim.cmd 'normal! j'
-    end
-    vim.cmd 'normal! ^'
-    return
-  end
-  -- Not on blank
-  vim.cmd 'normal! }'
-  while vim.fn.line '.' < vim.fn.line '$' and vim.fn.getline('.'):match '^%s*$' do
-    vim.cmd 'normal! j'
-  end
-  vim.cmd 'normal! ^'
-end
+  local total = vim.fn.line '$'
+  local row = vim.fn.line '.'
 
-local function next_paragraph_end()
-  local next_line = vim.fn.line '.' + 1
-  local next_is_blank = next_line > vim.fn.line '$' or vim.fn.getline(next_line):match '^%s*$'
-  if next_is_blank then
-    -- At last line of paragraph (or last line of file). Jump to next paragraph.
-    vim.cmd 'normal! }'
-    while vim.fn.line '.' < vim.fn.line '$' and vim.fn.getline('.'):match '^%s*$' do
-      vim.cmd 'normal! j'
-    end
-    -- Now on first line of next paragraph; walk to its last line.
-    while vim.fn.line '.' < vim.fn.line '$' and not vim.fn.getline(vim.fn.line '.' + 1):match '^%s*$' do
-      vim.cmd 'normal! j'
-    end
-  else
-    -- Mid-paragraph. Walk down to last line of current paragraph.
-    while vim.fn.line '.' < vim.fn.line '$' and not vim.fn.getline(vim.fn.line '.' + 1):match '^%s*$' do
-      vim.cmd 'normal! j'
-    end
+  -- if we are at the beginning of a paragraph move down one line
+  if row < total and is_paragraph_start(row) then row = advance(row, 1) end
+  -- keep moving down until we reach the beginning of a paragraph
+  while row < total and (vim.fn.getline(row):match '^%s*$' or (row > 1 and not vim.fn.getline(row - 1):match '^%s*$')) do
+    row = advance(row, 1)
   end
+
+  vim.api.nvim_win_set_cursor(0, { row, 0 })
   vim.cmd 'normal! ^'
 end
 
 local function prev_paragraph_end()
-  -- On a blank: walk up to first non-blank, which is the previous paragraph's end.
-  if vim.fn.getline('.'):match '^%s*$' then
-    while vim.fn.line '.' > 1 and vim.fn.getline('.'):match '^%s*$' do
-      vim.cmd 'normal! k'
-    end
-    vim.cmd 'normal! ^'
-    return
+  local total = vim.fn.line '$'
+  local row = vim.fn.line '.'
+
+  -- if we are at the end of a paragraph move up one line
+  if row > 1 and is_paragraph_end(row, total) then row = advance(row, -1) end
+  -- keep moving up until we reach the end of a paragraph
+  while row > 1 and (vim.fn.getline(row):match '^%s*$' or (row < total and not vim.fn.getline(row + 1):match '^%s*$')) do
+    row = advance(row, -1)
   end
-  -- Not on blank
-  vim.cmd 'normal! {'
-  while vim.fn.line '.' > 1 and vim.fn.getline('.'):match '^%s*$' do
-    vim.cmd 'normal! k'
+
+  vim.api.nvim_win_set_cursor(0, { row, 0 })
+  vim.cmd 'normal! ^'
+end
+
+local function prev_paragraph_start()
+  local row = vim.fn.line '.'
+
+  -- if we are at the start of a paragraph move up one line
+  if row > 1 and is_paragraph_start(row) then row = advance(row, -1) end
+  -- keep moving up until we reach the start of a paragraph
+  while row > 1 and (vim.fn.getline(row):match '^%s*$' or not vim.fn.getline(row - 1):match '^%s*$') do
+    row = advance(row, -1)
   end
+
+  vim.api.nvim_win_set_cursor(0, { row, 0 })
   vim.cmd 'normal! ^'
 end
 
@@ -214,3 +222,7 @@ vim.keymap.set({ 'n', 'x', 'o' }, '}', next_paragraph_start, { desc = 'Next para
 vim.keymap.set({ 'n', 'x', 'o' }, '{', prev_paragraph_start, { desc = 'Prev paragraph start' })
 vim.keymap.set({ 'n', 'x', 'o' }, 'g}', next_paragraph_end, { desc = 'Next paragraph end' })
 vim.keymap.set({ 'n', 'x', 'o' }, 'g{', prev_paragraph_end, { desc = 'Prev paragraph end' })
+
+-- Move around faster in insert mode
+vim.keymap.set('i', '<M-Right>', '<C-Right>', { desc = 'Move one word right' })
+vim.keymap.set('i', '<M-Left>', '<C-Left>', { desc = 'Move one word left' })
