@@ -4,6 +4,8 @@ vim.pack.add {
 
 -- did we toggle gitsigns margin indicator on zen entry?
 local gs_toggle_on_exit = false
+-- what window were we on when we entered zen?
+local pre_zen_win
 
 require('snacks').setup {
   animate = { enabled = true },
@@ -109,6 +111,13 @@ require('snacks').setup {
         require('gitsigns').toggle_signs(true)
         gs_toggle_on_exit = false
       end
+      -- re-focus window active prior to entering zen
+      if pre_zen_win then
+        vim.schedule(function()
+          if vim.api.nvim_win_is_valid(pre_zen_win) then vim.api.nvim_set_current_win(pre_zen_win) end
+          pre_zen_win = nil
+        end)
+      end
     end,
   },
 }
@@ -177,7 +186,11 @@ vim.keymap.set('n', '<leader>tt', function() Snacks.terminal.toggle() end, { des
 vim.keymap.set('n', '<leader>e', function() Snacks.explorer.open { focus = false } end, { desc = 'Toggle explorer pane' })
 
 -- zen
-vim.keymap.set('n', '<leader>z', function() Snacks.zen.zen() end, { desc = 'Toggle Zen mode' })
+vim.keymap.set('n', '<leader>z', function()
+  local zen_open = Snacks.zen.win and Snacks.zen.win:valid()
+  if not zen_open then pre_zen_win = vim.api.nvim_get_current_win() end
+  Snacks.zen.zen()
+end, { desc = 'Toggle zen mode' })
 
 -- autocmd to quit if only snacks windows remain
 vim.api.nvim_create_autocmd('QuitPre', {
