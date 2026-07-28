@@ -139,10 +139,8 @@ local function is_paragraph_start(row) return not vim.fn.getline(row):match '^%s
 local function advance(row, direction)
   local total = vim.fn.line '$'
   local function clamp(n) return math.max(1, math.min(n, total)) end
-
   local next_row = clamp(row + direction)
   local fold_start = vim.fn.foldclosed(next_row)
-
   if fold_start == -1 then return next_row end -- not in a fold
 
   if row == fold_start then
@@ -167,7 +165,9 @@ local function next_paragraph_end()
   if row < total and is_paragraph_end(row, total) then row = advance(row, 1) end
   -- keep moving down until we reach the end of a paragraph
   while row < total and (vim.fn.getline(row):match '^%s*$' or not vim.fn.getline(row + 1):match '^%s*$') do
+    local before = row
     row = advance(row, 1)
+    if row == before then break end
   end
 
   vim.api.nvim_win_set_cursor(0, { row, 0 })
@@ -182,7 +182,9 @@ local function next_paragraph_start()
   if row < total and is_paragraph_start(row) then row = advance(row, 1) end
   -- keep moving down until we reach the beginning of a paragraph
   while row < total and (vim.fn.getline(row):match '^%s*$' or (row > 1 and not vim.fn.getline(row - 1):match '^%s*$')) do
+    local before = row
     row = advance(row, 1)
+    if row == before then break end
   end
 
   vim.api.nvim_win_set_cursor(0, { row, 0 })
@@ -197,7 +199,9 @@ local function prev_paragraph_end()
   if row > 1 and is_paragraph_end(row, total) then row = advance(row, -1) end
   -- keep moving up until we reach the end of a paragraph
   while row > 1 and (vim.fn.getline(row):match '^%s*$' or (row < total and not vim.fn.getline(row + 1):match '^%s*$')) do
+    local before = row
     row = advance(row, -1)
+    if row == before then break end
   end
 
   vim.api.nvim_win_set_cursor(0, { row, 0 })
@@ -211,7 +215,9 @@ local function prev_paragraph_start()
   if row > 1 and is_paragraph_start(row) then row = advance(row, -1) end
   -- keep moving up until we reach the start of a paragraph
   while row > 1 and (vim.fn.getline(row):match '^%s*$' or not vim.fn.getline(row - 1):match '^%s*$') do
+    local before = row
     row = advance(row, -1)
+    if row == before then break end
   end
 
   vim.api.nvim_win_set_cursor(0, { row, 0 })

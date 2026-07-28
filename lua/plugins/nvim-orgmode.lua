@@ -112,3 +112,10 @@ require('orgmode').setup {
 vim.lsp.enable 'org'
 
 require('org-bullets').setup()
+
+-- Convenience mapping to convert md links to org
+vim.keymap.set('n', '<leader>olc', function()
+  local line = vim.api.nvim_get_current_line()
+  local new_line = line:gsub('%[([^%]]+)%]%(([^)]+)%)', '[[%2][%1]]')
+  vim.api.nvim_set_current_line(new_line)
+end, { desc = 'Convert markdown links on current line' })
