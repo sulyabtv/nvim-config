@@ -39,10 +39,11 @@ vim.o.showmode = false
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
 -- Wrap, etc.
+-- Sadly, Neovim does not have soft-wrap at arbitrary columns.
+-- See https://github.com/neovim/neovim/issues/4386
 vim.o.wrap = true
 vim.o.linebreak = true
 vim.o.breakindent = true
-vim.fn.matchadd('ErrorMsg', '\\%100v.\\+') -- use scary color if line goes beyond 99 chars
 
 -- Enable undo/redo changes even after closing and reopening a file
 vim.o.undofile = true
@@ -70,9 +71,6 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
-
--- Always keep the current line centered
-vim.o.scrolloff = 999
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
@@ -123,10 +121,10 @@ vim.opt.concealcursor = 'nc'
 vim.o.foldlevelstart = 1 -- start with all but outermost fold closed
 
 -- remember folds when switching between buffers
-local group = vim.api.nvim_create_augroup('remember-folds', { clear = true })
+local fold_group = vim.api.nvim_create_augroup('remember-folds', { clear = true })
 
 vim.api.nvim_create_autocmd({ 'BufWinLeave' }, {
-  group = group,
+  group = fold_group,
   pattern = '?*', -- only real, named buffers
   callback = function()
     if vim.bo.buftype == '' then -- skip special buffers (help, terminal, quickfix, etc.)
@@ -136,7 +134,7 @@ vim.api.nvim_create_autocmd({ 'BufWinLeave' }, {
 })
 
 vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
-  group = group,
+  group = fold_group,
   pattern = '?*',
   callback = function()
     if vim.bo.buftype == '' then pcall(vim.cmd.loadview) end

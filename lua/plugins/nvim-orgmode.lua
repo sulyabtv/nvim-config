@@ -119,3 +119,11 @@ vim.keymap.set('n', '<leader>olc', function()
   local new_line = line:gsub('%[([^%]]+)%]%(([^)]+)%)', '[[%2][%1]]')
   vim.api.nvim_set_current_line(new_line)
 end, { desc = 'Convert markdown links on current line' })
+
+-- Make verbatim visually distinct from code
+vim.api.nvim_create_autocmd('ColorScheme', {
+  callback = function()
+    vim.api.nvim_set_hl(0, '@org.verbatim', { link = 'Constant' })
+    vim.api.nvim_set_hl(0, '@org.verbatim.delimiter', { link = 'Constant' })
+  end,
+})

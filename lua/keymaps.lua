@@ -103,6 +103,10 @@ vim.keymap.set('n', '<leader>yr', function()
   vim.notify(p)
 end, { desc = 'Yank relative path' })
 
+-- open window splits
+vim.keymap.set('n', '<leader>-', '<Cmd>split<CR>', { desc = 'New horizontal split' })
+vim.keymap.set('n', '<leader>|', '<Cmd>vsplit<CR>', { desc = 'New vertical split' })
+
 -- close current tabpage/window
 vim.keymap.set('n', '<leader>xt', '<Cmd>tabclose<CR>', { desc = 'Close current tab' })
 vim.keymap.set('n', '<leader>xw', '<Cmd>close<CR>', { desc = 'Close current window' })
@@ -136,6 +140,11 @@ local function is_paragraph_end(row, total) return not vim.fn.getline(row):match
 
 local function is_paragraph_start(row) return not vim.fn.getline(row):match '^%s*$' and (row == 1 or vim.fn.getline(row - 1):match '^%s*$') end
 
+local function fold_visible_row(row)
+  local fold_start = vim.fn.foldclosed(row)
+  return fold_start == -1 and row or fold_start
+end
+
 local function advance(row, direction)
   local total = vim.fn.line '$'
   local function clamp(n) return math.max(1, math.min(n, total)) end
@@ -159,7 +168,7 @@ end
 
 local function next_paragraph_end()
   local total = vim.fn.line '$'
-  local row = vim.fn.line '.'
+  local row = fold_visible_row(vim.fn.line '.')
 
   -- if we are at the end of a paragraph move down one line
   if row < total and is_paragraph_end(row, total) then row = advance(row, 1) end
@@ -176,7 +185,7 @@ end
 
 local function next_paragraph_start()
   local total = vim.fn.line '$'
-  local row = vim.fn.line '.'
+  local row = fold_visible_row(vim.fn.line '.')
 
   -- if we are at the beginning of a paragraph move down one line
   if row < total and is_paragraph_start(row) then row = advance(row, 1) end
@@ -193,7 +202,7 @@ end
 
 local function prev_paragraph_end()
   local total = vim.fn.line '$'
-  local row = vim.fn.line '.'
+  local row = fold_visible_row(vim.fn.line '.')
 
   -- if we are at the end of a paragraph move up one line
   if row > 1 and is_paragraph_end(row, total) then row = advance(row, -1) end
@@ -209,7 +218,7 @@ local function prev_paragraph_end()
 end
 
 local function prev_paragraph_start()
-  local row = vim.fn.line '.'
+  local row = fold_visible_row(vim.fn.line '.')
 
   -- if we are at the start of a paragraph move up one line
   if row > 1 and is_paragraph_start(row) then row = advance(row, -1) end
@@ -232,3 +241,7 @@ vim.keymap.set({ 'n', 'x', 'o' }, 'g{', prev_paragraph_end, { desc = 'Prev parag
 -- Move around faster in insert mode
 vim.keymap.set('i', '<M-Right>', '<C-Right>', { desc = 'Move one word right' })
 vim.keymap.set('i', '<M-Left>', '<C-Left>', { desc = 'Move one word left' })
+
+-- Navigate display lines using arrow keys
+vim.keymap.set({ 'n', 'x' }, '<Down>', 'gj', { desc = 'Down' })
+vim.keymap.set({ 'n', 'x' }, '<Up>', 'gk', { desc = 'Up' })

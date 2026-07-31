@@ -17,6 +17,12 @@ require('snacks').setup {
   lazygit = {
     enabled = true,
     configure = true,
+    config = {
+      os = {
+        -- do not open a new tabpage for editing
+        edit = '[ -z ""$NVIM"" ] && (nvim -- {{filename}}) || (nvim --server ""$NVIM"" --remote-send ""q"" && nvim --server ""$NVIM"" --remote {{filename}})',
+      },
+    },
     theme = {
       activeBorderColor = { fg = 'Special' },
       inactiveBorderColor = { fg = 'NonText' },
@@ -183,7 +189,7 @@ vim.keymap.set('n', '<leader>S', function() Snacks.scratch.select() end, { desc 
 vim.keymap.set('n', '<leader>tt', function() Snacks.terminal.toggle() end, { desc = 'Toggle terminal' })
 
 -- explorer
-vim.keymap.set('n', '<leader>e', function() Snacks.explorer.open { focus = false } end, { desc = 'Toggle explorer pane' })
+vim.keymap.set('n', '<leader>e', function() Snacks.explorer.open() end, { desc = 'Toggle explorer pane' })
 
 -- zen
 vim.keymap.set('n', '<leader>z', function()

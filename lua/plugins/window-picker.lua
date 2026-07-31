@@ -6,8 +6,22 @@ require('window-picker').setup {
   hint = 'floating-letter',
   show_prompt = false,
   filter_rules = {
-    include_current_win = false,
     autoselect_one = true,
+    bo = {
+      -- ignore windows with the following filetypes
+      filetype = {
+        'NvimTree',
+        'neo-tree',
+        'notify',
+        'snacks_notif',
+        'snacks_layout_box',
+        'snacks_picker_input',
+      },
+      -- ignore windows with the following buftypes
+      buftype = {
+        'terminal',
+      },
+    },
   },
 }
 
