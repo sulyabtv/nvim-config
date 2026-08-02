@@ -7,6 +7,22 @@ local function gh(repo) return 'https://github.com/' .. repo end
 vim.pack.add { { src = gh 'L3MON4D3/LuaSnip', version = vim.version.range '2.*' } }
 require('luasnip').setup {}
 
+-- Fix for weird jumps that sometimes happen when pressing tab
+-- See https://github.com/L3MON4D3/LuaSnip/issues/258
+vim.api.nvim_create_autocmd('ModeChanged', {
+  pattern = '*',
+  callback = function()
+    if
+      ---@diagnostic disable-next-line: undefined-field
+      ((vim.v.event.old_mode == 's' and vim.v.event.new_mode == 'n') or vim.v.event.old_mode == 'i')
+      and require('luasnip').session.current_nodes[vim.api.nvim_get_current_buf()]
+      and not require('luasnip').session.jump_active
+    then
+      require('luasnip').unlink_current()
+    end
+  end,
+})
+
 -- `friendly-snippets` contains a variety of premade snippets.
 --    See the README about individual language/framework/plugin snippets:
 --    https://github.com/rafamadriz/friendly-snippets

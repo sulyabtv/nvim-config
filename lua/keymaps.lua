@@ -14,8 +14,9 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('v', '<', '<gv', { desc = 'Indent left' })
 vim.keymap.set('v', '>', '>gv', { desc = 'Indent right' })
 
--- C-/ to toggle comment
-vim.keymap.set({ 'n', 'i', 'v' }, '<C-/>', function() vim.cmd 'normal gcc' end, { desc = 'Toggle comment' })
+-- M-/ to toggle comment
+vim.keymap.set({ 'n', 'v' }, '<M-/>', function() vim.cmd 'normal gcc' end, { desc = 'Toggle comment' })
+vim.keymap.set({ 'i' }, '<M-/>', function() require('mini.comment').toggle_lines(vim.fn.line '.', vim.fn.line '.') end, { desc = 'Toggle comment' })
 
 -- Diagnostic Config & Keymaps
 vim.diagnostic.config {
@@ -269,3 +270,6 @@ end, { desc = 'Jump down few lines' })
 -- Navigate display lines using arrow keys
 vim.keymap.set({ 'n', 'x' }, '<Down>', 'gj', { desc = 'Down' })
 vim.keymap.set({ 'n', 'x' }, '<Up>', 'gk', { desc = 'Up' })
+
+-- M-BS to delete word in insert mode
+vim.keymap.set('i', '<M-BS>', '<C-w>', { desc = 'Delete word backward' })
