@@ -179,7 +179,7 @@ vim.keymap.set('n', '<leader>hu', function() Snacks.picker.undo() end, { desc = 
 
 -- picker
 vim.keymap.set('n', '<leader>pc', function() Snacks.picker.colorschemes() end, { desc = 'Choose color scheme' })
-vim.keymap.set('n', '<leader>pr', function() Snacks.picker.resume() end, { desc = 'Resume last picker' })
+vim.keymap.set('n', '<leader>r', function() Snacks.picker.resume() end, { desc = 'Resume last picker' })
 vim.keymap.set('n', '<leader>pp', function() Snacks.picker.pickers() end, { desc = 'Show all pickers' })
 
 -- general
@@ -192,7 +192,7 @@ vim.keymap.set('n', '<leader>tt', function() Snacks.terminal.toggle() end, { des
 vim.keymap.set('n', '<leader>e', function() Snacks.explorer.open() end, { desc = 'Toggle explorer pane' })
 
 -- zen
-vim.keymap.set('n', '<leader>z', function()
+vim.keymap.set({ 'n', 'i' }, '<M-z>', function()
   local zen_open = Snacks.zen.win and Snacks.zen.win:valid()
   if not zen_open then pre_zen_win = vim.api.nvim_get_current_win() end
   Snacks.zen.zen()

@@ -3,22 +3,23 @@ vim.pack.add {
   'https://github.com/MunifTanjim/nui.nvim',
 }
 
+-- Hack to not let noice swallow duplicate notifications
+local state = require 'noice.ui.state'
+local original_skip = state.skip
+---@diagnostic disable-next-line: duplicate-set-field
+state.skip = function(event, kind, ...)
+  if event == 'msg_show' then
+    state.set(event, kind, ...)
+    return false
+  end
+  return original_skip(event, kind, ...)
+end
+
 require('noice').setup {
   lsp = {
-    override = {
-      ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
-      ['vim.lsp.util.stylize_markdown'] = true,
-      ['cmp.entry.get_documentation'] = true,
-    },
-    progress = {
-      enabled = false, -- reduce visual spam, show in lualine instead
-    },
-    hover = {
-      enabled = true,
-    },
-    signature = {
-      enabled = true,
-    },
+    progress = { enabled = false },
+    hover = { enabled = false },
+    signature = { enabled = false },
   },
   commands = {
     all = { view = 'popup' },
@@ -43,11 +44,3 @@ require('noice').setup {
 
 -- message history
 vim.keymap.set('n', '<leader>hm', function() require('noice').cmd 'all' end, { desc = 'Message history' })
-
--- LSP hover/signature scrolling
-vim.keymap.set({ 'n', 'i', 's' }, '<c-f>', function()
-  if not require('noice.lsp').scroll(4) then return '<c-f>' end
-end, { silent = true, expr = true })
-vim.keymap.set({ 'n', 'i', 's' }, '<c-b>', function()
-  if not require('noice.lsp').scroll(-4) then return '<c-b>' end
-end, { silent = true, expr = true })

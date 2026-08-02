@@ -233,14 +233,38 @@ local function prev_paragraph_start()
   vim.cmd 'normal! ^'
 end
 
-vim.keymap.set({ 'n', 'x', 'o' }, '}', next_paragraph_start, { desc = 'Next paragraph start' })
-vim.keymap.set({ 'n', 'x', 'o' }, '{', prev_paragraph_start, { desc = 'Prev paragraph start' })
-vim.keymap.set({ 'n', 'x', 'o' }, 'g}', next_paragraph_end, { desc = 'Next paragraph end' })
-vim.keymap.set({ 'n', 'x', 'o' }, 'g{', prev_paragraph_end, { desc = 'Prev paragraph end' })
+vim.keymap.set('n', '}', next_paragraph_start, { desc = 'Next paragraph start' })
+vim.keymap.set('n', '{', prev_paragraph_start, { desc = 'Prev paragraph start' })
+vim.keymap.set('n', 'g}', next_paragraph_end, { desc = 'Next paragraph end' })
+vim.keymap.set('n', 'g{', prev_paragraph_end, { desc = 'Prev paragraph end' })
 
--- Move around faster in insert mode
-vim.keymap.set('i', '<M-Right>', '<C-Right>', { desc = 'Move one word right' })
-vim.keymap.set('i', '<M-Left>', '<C-Left>', { desc = 'Move one word left' })
+-- Move around faster using M-<Up/Down/Left/Right>
+vim.keymap.set({ 'n', 'i', 'x' }, '<M-Right>', function()
+  local line_before = vim.fn.line '.'
+  local end_col = vim.fn.col { line_before, '$' }
+  vim.cmd 'normal! w'
+  if vim.fn.line '.' ~= line_before then
+    vim.fn.cursor(line_before, end_col) -- don't move past end of line
+  end
+end, { desc = 'Move one word right' })
+
+vim.keymap.set({ 'n', 'i', 'x' }, '<M-Left>', function()
+  local line_before = vim.fn.line '.'
+  vim.cmd 'normal! b'
+  if vim.fn.line '.' ~= line_before then
+    vim.fn.cursor(line_before, 1) -- don't move past beginning of line
+  end
+end, { desc = 'Move one word left' })
+
+vim.keymap.set({ 'n', 'i', 'x' }, '<M-Up>', function()
+  local n = math.max(1, math.floor(vim.api.nvim_win_get_height(0) / 5))
+  vim.cmd('normal! ' .. n .. 'gk')
+end, { desc = 'Jump up few lines' })
+
+vim.keymap.set({ 'n', 'i', 'x' }, '<M-Down>', function()
+  local n = math.max(1, math.floor(vim.api.nvim_win_get_height(0) / 5))
+  vim.cmd('normal! ' .. n .. 'gj')
+end, { desc = 'Jump down few lines' })
 
 -- Navigate display lines using arrow keys
 vim.keymap.set({ 'n', 'x' }, '<Down>', 'gj', { desc = 'Down' })

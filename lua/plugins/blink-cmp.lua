@@ -22,46 +22,25 @@ require('luasnip.loaders.from_lua').lazy_load {
 vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
 require('blink.cmp').setup {
   keymap = {
-    -- 'default' (recommended) for mappings similar to built-in completions
-    --   <c-y> to accept ([y]es) the completion.
-    --    This will auto-import if your LSP supports it.
-    --    This will expand snippets if the LSP sent a snippet.
-    -- 'super-tab' for tab to accept
-    -- 'enter' for enter to accept
-    -- 'none' for no mappings
-    --
-    -- For an understanding of why the 'default' preset is recommended,
-    -- you will need to read `:help ins-completion`
-    --
-    -- No, but seriously. Please read `:help ins-completion`, it is really good!
-    --
-    -- All presets have the following mappings:
-    -- <tab>/<s-tab>: move to right/left of your snippet expansion
-    -- <c-space>: Open menu or open docs if already open
-    -- <c-n>/<c-p> or <up>/<down>: Select next/previous item
-    -- <c-e>: Hide menu
-    -- <c-k>: Toggle signature help
-    --
-    -- See `:help blink-cmp-config-keymap` for defining your own keymap
+    -- C-space: Open menu or open docs if already open
+    -- C-n/C-p or Up/Down: Select next/previous item
+    -- C-e: Hide menu
+    -- C-k: Toggle signature help (if signature.enabled = true)
     preset = 'super-tab',
-    ['<Esc>'] = { 'hide', 'fallback' },
-
-    -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-    --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+    ['<Esc>'] = { 'cancel', 'fallback' },
   },
-
   appearance = {
-    -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-    -- Adjusts spacing to ensure icons are aligned
     nerd_font_variant = 'mono',
   },
-
   completion = {
-    -- By default, you may press `<c-space>` to show the documentation.
-    -- Optionally, set `auto_show = true` to show the documentation after a delay.
+    menu = { auto_show = true },
+    trigger = {
+      show_on_insert = true,
+      show_on_blocked_trigger_characters = {},
+      show_on_x_blocked_trigger_characters = {},
+    },
     documentation = { auto_show = true, auto_show_delay_ms = 500 },
   },
-
   sources = {
     default = { 'lsp', 'path', 'snippets', 'buffer' },
     per_filetype = {
@@ -69,6 +48,15 @@ require('blink.cmp').setup {
       org = { 'orgmode', 'path', 'snippets', 'buffer' }, -- no lsp
     },
     providers = {
+      lsp = {
+        override = {
+          get_trigger_characters = function(self)
+            local trigger_characters = self:get_trigger_characters()
+            vim.list_extend(trigger_characters, { '\n', '\t', ' ' })
+            return trigger_characters
+          end,
+        },
+      },
       mkdnflow = {
         name = 'Mkdnflow',
         module = 'mkdnflow.completion.blink',
@@ -99,20 +87,34 @@ require('blink.cmp').setup {
       },
     },
   },
-
   snippets = { preset = 'luasnip' },
-
-  -- Blink.cmp includes an optional, recommended rust fuzzy matcher,
-  -- which automatically downloads a prebuilt binary when enabled.
-  --
-  -- By default, we use the Lua implementation instead, but you may enable
-  -- the rust implementation via `'prefer_rust_with_warning'`
-  --
-  -- See `:help blink-cmp-config-fuzzy` for more information
   fuzzy = { implementation = 'lua' },
-
-  -- Shows a signature help window while you type arguments for a function
-  -- signature = { enabled = true }, -- let noice handle signatures
+  cmdline = {
+    enabled = true,
+    keymap = {
+      preset = 'inherit',
+      ['<Esc>'] = {
+        function()
+          if vim.fn.getcmdtype() == ':' and require('blink.cmp').is_visible() then
+            -- If completion menu is active, just close it
+            require('blink.cmp').hide()
+            return true
+          end
+          -- Completion not active => close the cmdline
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-c>', true, false, true), 'n', false)
+          return true
+        end,
+      },
+    },
+    completion = {
+      menu = {
+        -- Only show completions for commands
+        auto_show = function() return vim.fn.getcmdtype() == ':' end,
+      },
+    },
+  },
+  signature = {
+    enabled = true,
+    window = { border = 'solid', show_documentation = true },
+  },
 }
-
--- vim: ts=2 sts=2 sw=2 et

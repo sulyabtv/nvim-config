@@ -36,15 +36,7 @@ require('lualine').setup {
       { 'diff' },
       { 'diagnostics' },
     },
-    lualine_c = {
-      {
-        -- message
-        ---@diagnostic disable-next-line: undefined-field
-        require('noice').api.status.message.get_hl,
-        ---@diagnostic disable-next-line: undefined-field
-        cond = require('noice').api.status.message.has,
-      },
-    },
+    lualine_c = {},
     lualine_x = {
       { macro_recording, color = 'WarningMsg' },
       { 'searchcount' },
