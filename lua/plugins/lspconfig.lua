@@ -83,10 +83,7 @@ local servers = {
   rust_analyzer = {},
   marksman = {},
   texlab = {},
-  html = {},
-  cssls = {},
   bashls = {},
-
   -- Special Lua Config, as recommended by neovim help docs
   lua_ls = {
     on_init = function(client)
@@ -136,9 +133,10 @@ vim.pack.add {
 -- Automatically install LSPs and related tools to stdpath for Neovim
 require('mason').setup {}
 
--- Translates between nvim-lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
+-- Translates between nvim-lspconfig server names and mason.nvim package names
+-- (e.g. lua_ls <-> lua-language-server)
 require('mason-lspconfig').setup {
-  automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
+  automatic_enable = true,
 }
 
 -- Ensure the servers and tools above are installed
