@@ -21,7 +21,7 @@ require('conform').setup {
 
     local choice = enabled_filetypes[vim.bo[bufnr].filetype]
     if not choice then return nil end
-    local opts = { timeout_ms = 500, lsp_fallback = true }
+    local opts = { timeout_ms = 1000, lsp_fallback = true }
     if type(choice) == 'string' then opts.formatters = { choice } end
     return opts
   end,
