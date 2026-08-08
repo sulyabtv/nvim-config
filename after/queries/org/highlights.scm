@@ -10,3 +10,6 @@
 
 ((block name: (expr) @_name (contents) @org.comment)
  (#match? @_name "\\c^comment$"))
+
+; Do not spell check comments
+(comment) @nospell

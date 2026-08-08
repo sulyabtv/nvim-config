@@ -38,24 +38,44 @@ require('luasnip.loaders.from_lua').lazy_load {
 vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
 require('blink.cmp').setup {
   keymap = {
-    -- C-space: Open menu or open docs if already open
-    -- C-n/C-p or Up/Down: Select next/previous item
-    -- C-e: Hide menu
-    -- C-k: Toggle signature help (if signature.enabled = true)
     preset = 'super-tab',
     ['<Esc>'] = { 'cancel', 'fallback' },
+    ['<C-space>'] = {
+      function(cmp)
+        if not cmp.is_visible() then return cmp.show() end
+        return cmp.hide()
+      end,
+      'fallback',
+    },
+    -- ['<C-e>'] = { 'cancel', 'fallback' },
+    -- ['<Tab>'] = {
+    --   function(cmp)
+    --     if cmp.snippet_active() then
+    --       return cmp.accept()
+    --     else
+    --       return cmp.select_and_accept()
+    --     end
+    --   end,
+    --   'snippet_forward',
+    --   'fallback',
+    -- },
+    -- ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
+    -- ['<Up>'] = { 'select_prev', 'fallback' },
+    -- ['<Down>'] = { 'select_next', 'fallback' },
+    -- ['<C-p>'] = { 'select_prev', 'fallback_to_mappings' },
+    -- ['<C-n>'] = { 'select_next', 'fallback_to_mappings' },
+    -- ['<C-b>'] = { 'scroll_documentation_up', 'fallback' },
+    -- ['<C-f>'] = { 'scroll_documentation_down', 'fallback' },
+    -- ['<C-k>'] = { 'show_signature', 'hide_signature', 'fallback' },
   },
   appearance = {
     nerd_font_variant = 'mono',
   },
   completion = {
     menu = { auto_show = true },
-    trigger = {
-      show_on_insert = true,
-      show_on_blocked_trigger_characters = {},
-      show_on_x_blocked_trigger_characters = {},
-    },
-    documentation = { auto_show = true, auto_show_delay_ms = 500 },
+    trigger = { show_in_snippet = false },
+    documentation = { auto_show = true },
+    list = { selection = { auto_insert = false } },
   },
   sources = {
     default = { 'lsp', 'path', 'snippets', 'buffer' },

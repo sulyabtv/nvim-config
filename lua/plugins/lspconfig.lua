@@ -1,37 +1,23 @@
 local function gh(repo) return 'https://github.com/' .. repo end
 
---  This function gets run when an LSP attaches to a particular buffer.
---    That is to say, every time a new file is opened that is associated with
---    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
---    function will be executed to configure the current buffer
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
   callback = function(event)
-    -- NOTE: Remember that Lua is a real programming language, and as such it is possible
-    -- to define small helper and utility functions so you don't have to repeat yourself.
-    --
-    -- In this case, we create a function that lets us more easily define mappings specific
-    -- for LSP related items. It sets the mode, buffer and description for us each time.
     local map = function(keys, func, desc, mode)
       mode = mode or 'n'
       vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = desc })
     end
 
-    -- Toggle diagnostics to reduce visual spam
-    map('<leader>td', function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, 'Toggle diagnostics')
-
-    -- Rename the variable under your cursor.
-    --  Most Language Servers support renaming across files, etc.
-    map('<leader>ln', vim.lsp.buf.rename, 'LSP rename')
-
-    -- Execute a code action, usually your cursor needs to be on top of an error
-    -- or a suggestion from your LSP for this to activate.
-    map('<leader>la', vim.lsp.buf.code_action, 'Code action', { 'n', 'x' })
-
-    -- The following two autocommands are used to highlight references of the
-    -- word under your cursor when your cursor rests there for a little while.
-    -- When you move your cursor, the highlights will be cleared (the second autocommand).
     local client = vim.lsp.get_client_by_id(event.data.client_id)
+
+    map('<leader>ln', vim.lsp.buf.rename, 'LSP rename')
+    map('<leader>la', vim.lsp.buf.code_action, 'Code action', { 'n', 'x' })
+    map('<leader>td', function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, 'Toggle diagnostics')
+    if client and client:supports_method('textDocument/inlayHint', event.buf) then
+      map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, 'Toggle inlay hints')
+    end
+
+    -- Highlight references of the word under the cursor
     if client and client:supports_method('textDocument/documentHighlight', event.buf) then
       local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
       vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
@@ -54,20 +40,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
         end,
       })
     end
-
-    -- The following code creates a keymap to toggle inlay hints in your
-    -- code, if the language server you are using supports them
-    --
-    -- This may be unwanted, since they displace some of your code
-    if client and client:supports_method('textDocument/inlayHint', event.buf) then
-      map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, 'Toggle inlay hints')
-    end
   end,
 })
 
 -- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---  See `:help lsp-config` for information about keys and how to configure
 ---@type table<string, vim.lsp.Config>
 local servers = {
   basedpyright = {
@@ -83,8 +59,6 @@ local servers = {
   rust_analyzer = {},
   marksman = {},
   texlab = {},
-  html = {},
-  cssls = {},
   bashls = {},
 
   -- Special Lua Config, as recommended by neovim help docs
@@ -101,20 +75,15 @@ local servers = {
       client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
         runtime = {
           version = 'LuaJIT',
-          path = { 'lua/?.lua', 'lua/?/init.lua' },
         },
         workspace = {
           checkThirdParty = false,
-          -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
-          --  See https://github.com/neovim/nvim-lspconfig/issues/3189
-          library = vim.tbl_extend('force', vim.api.nvim_get_runtime_file('', true), {
-            '${3rd}/luv/library',
-            '${3rd}/busted/library',
-          }),
+          library = {
+            vim.env.VIMRUNTIME,
+          },
         },
       })
     end,
-    ---@type lspconfig.settings.lua_ls
     settings = {
       Lua = {
         format = { enable = false }, -- Disable formatting (formatting is done by stylua)
@@ -138,16 +107,10 @@ require('mason').setup {}
 
 -- Translates between nvim-lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
 require('mason-lspconfig').setup {
-  automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
+  automatic_enable = true, -- Enable servers installed manually through :Mason
 }
 
--- Ensure the servers and tools above are installed
---
--- To check the current status of installed tools and/or manually install
--- other tools, you can run
---    :Mason
---
--- You can press `g?` for help in this menu.
+-- Auto-install the above servers and other Mason-provided tools
 local ensure_installed = vim.tbl_keys(servers or {})
 vim.list_extend(ensure_installed, {
   'ruff',
@@ -165,5 +128,3 @@ for name, server in pairs(servers) do
   vim.lsp.config(name, server)
   vim.lsp.enable(name)
 end
-
--- vim: ts=2 sts=2 sw=2 et

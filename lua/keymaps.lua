@@ -64,6 +64,10 @@ end, { desc = 'Toggle tmux status bar' })
 -- toggle neovim statusline
 vim.keymap.set('n', '<leader>ts', function() vim.o.laststatus = vim.o.laststatus == 0 and 3 or 0 end, { desc = 'Toggle statusline' })
 
+-- Toggle spellcheck
+vim.keymap.set('n', '<leader>ts', function() vim.wo.spell = not vim.wo.spell end, { desc = 'Toggle spellcheck' })
+
+-- Copy whole file to clipboard
 vim.keymap.set('n', '<C-c>', '<cmd>%y+<cr>', { desc = 'Copy whole file to clipboard' })
 
 -- vim pack shortcuts

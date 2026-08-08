@@ -140,3 +140,14 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
     if vim.bo.buftype == '' then pcall(vim.cmd.loadview) end
   end,
 })
+
+-- Spell check
+vim.opt.spelllang = 'en_us'
+local spell_dir = vim.fn.stdpath 'config' .. '/spell'
+vim.fn.mkdir(spell_dir, 'p')
+vim.opt.spellfile = spell_dir .. '/spell/en.utf-8.add'
+
+-- Shift-arrow and click-and-drag to go to "select mode"
+-- (pressing a character replaces selected text)
+vim.opt.keymodel = { 'startsel', 'stopsel' }
+vim.opt.selectmode = { 'key', 'mouse' }
