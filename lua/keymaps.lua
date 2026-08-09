@@ -18,30 +18,6 @@ vim.keymap.set('v', '>', '>gv', { desc = 'Indent right' })
 vim.keymap.set({ 'n', 'v' }, '<M-/>', function() vim.cmd 'normal gcc' end, { desc = 'Toggle comment' })
 vim.keymap.set({ 'i' }, '<M-/>', function() require('mini.comment').toggle_lines(vim.fn.line '.', vim.fn.line '.') end, { desc = 'Toggle comment' })
 
--- Diagnostic Config & Keymaps
-vim.diagnostic.config {
-  update_in_insert = false,
-  severity_sort = true,
-  float = { border = 'rounded', source = 'if_many' },
-  underline = { severity = { min = vim.diagnostic.severity.WARN } },
-
-  -- Can switch between these as you prefer
-  virtual_text = true, -- Text shows up at the end of the line
-  virtual_lines = false, -- Text shows up underneath the line, with virtual lines
-
-  -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
-  jump = {
-    on_jump = function(_, bufnr)
-      vim.diagnostic.open_float {
-        bufnr = bufnr,
-        scope = 'cursor',
-        focus = false,
-      }
-    end,
-  },
-}
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-
 -- Double Esc to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
@@ -277,3 +253,7 @@ vim.keymap.set({ 'n', 'x' }, '<Up>', 'gk', { desc = 'Up' })
 
 -- M-BS to delete word in insert mode
 vim.keymap.set('i', '<M-BS>', '<C-w>', { desc = 'Delete word backward' })
+
+-- Diagnostics
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic quickfix list' })
+vim.keymap.set('n', '<leader>td', function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, { desc = 'Toggle diagnostics' })

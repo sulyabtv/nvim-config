@@ -12,7 +12,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     map('<leader>ln', vim.lsp.buf.rename, 'LSP rename')
     map('<leader>la', vim.lsp.buf.code_action, 'Code action', { 'n', 'x' })
-    map('<leader>td', function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, 'Toggle diagnostics')
     if client and client:supports_method('textDocument/inlayHint', event.buf) then
       map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, 'Toggle inlay hints')
     end

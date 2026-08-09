@@ -151,3 +151,27 @@ vim.opt.spellfile = spell_dir .. '/spell/en.utf-8.add'
 -- (pressing a character replaces selected text)
 vim.opt.keymodel = { 'startsel', 'stopsel' }
 vim.opt.selectmode = { 'key', 'mouse' }
+
+-- Diagnostic Config
+vim.diagnostic.config {
+  update_in_insert = false,
+  severity_sort = true,
+  float = { border = 'rounded', source = 'if_many' },
+  underline = { severity = { min = vim.diagnostic.severity.WARN } },
+
+  virtual_text = true, -- Text shows up at the end of the line
+  virtual_lines = false, -- Text shows up underneath the line
+
+  -- Auto open the float when jumping with `[d` and `]d`
+  jump = {
+    on_jump = function(_, bufnr)
+      vim.diagnostic.open_float {
+        bufnr = bufnr,
+        scope = 'cursor',
+        focus = false,
+      }
+    end,
+  },
+}
+-- Start with inline diagnostics disabled
+vim.diagnostic.enable(false)

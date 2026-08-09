@@ -35,8 +35,6 @@ require('snacks').setup {
     enabled = true,
     sources = {
       explorer = {
-        hidden = true,
-        ignored = true,
         exclude = { '.git' },
         layout = {
           layout = {
@@ -179,7 +177,7 @@ vim.keymap.set('n', '<leader>hu', function() Snacks.picker.undo() end, { desc = 
 
 -- picker
 vim.keymap.set('n', '<leader>pc', function() Snacks.picker.colorschemes() end, { desc = 'Choose color scheme' })
-vim.keymap.set('n', '<leader>r', function() Snacks.picker.resume() end, { desc = 'Resume last picker' })
+vim.keymap.set('n', '<leader>r', function() pcall(Snacks.picker.resume) end, { desc = 'Resume last picker' })
 vim.keymap.set('n', '<leader>pp', function() Snacks.picker.pickers() end, { desc = 'Show all pickers' })
 
 -- general

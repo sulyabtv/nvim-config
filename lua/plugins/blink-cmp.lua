@@ -1,9 +1,6 @@
 local function gh(repo) return 'https://github.com/' .. repo end
 
--- [[ Snippet Engine ]]
-
--- NOTE: You can also specify plugin using a version range for its git tag.
---  See `:help vim.version.range()` for more info
+-- Snippet Engine
 vim.pack.add { { src = gh 'L3MON4D3/LuaSnip', version = vim.version.range '2.*' } }
 require('luasnip').setup {}
 
@@ -24,8 +21,6 @@ vim.api.nvim_create_autocmd('ModeChanged', {
 })
 
 -- `friendly-snippets` contains a variety of premade snippets.
---    See the README about individual language/framework/plugin snippets:
---    https://github.com/rafamadriz/friendly-snippets
 vim.pack.add { gh 'rafamadriz/friendly-snippets' }
 require('luasnip.loaders.from_vscode').lazy_load()
 
@@ -124,7 +119,7 @@ require('blink.cmp').setup {
     },
   },
   snippets = { preset = 'luasnip' },
-  fuzzy = { implementation = 'lua' },
+  fuzzy = { implementation = 'prefer_rust_with_warning' },
   cmdline = {
     enabled = true,
     keymap = {
