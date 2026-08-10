@@ -149,7 +149,7 @@ vim.opt.spellfile = spell_dir .. '/spell/en.utf-8.add'
 
 -- Shift-arrow and click-and-drag to go to "select mode"
 -- (pressing a character replaces selected text)
-vim.opt.keymodel = { 'startsel', 'stopsel' }
+vim.opt.keymodel = { 'startsel' }
 vim.opt.selectmode = { 'key', 'mouse' }
 
 -- Diagnostic Config
