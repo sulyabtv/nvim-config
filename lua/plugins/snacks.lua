@@ -71,7 +71,7 @@ require('snacks').setup {
   quickfile = { enabled = true },
   rename = { enabled = true },
   scope = { enabled = true },
-  terminal = { enabled = true, win = { position = 'bottom', height = 12 } },
+  terminal = { enabled = true, win = { position = 'float' } },
   toggle = { enabled = true },
   words = { enabled = true },
   zen = {

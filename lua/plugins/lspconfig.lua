@@ -119,6 +119,7 @@ vim.list_extend(ensure_installed, {
   'tex-fmt',
   'shfmt',
   'shellcheck',
+  'bibtex-tidy',
 })
 
 require('mason-tool-installer').setup { ensure_installed = ensure_installed }

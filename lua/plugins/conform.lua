@@ -8,15 +8,17 @@ require('conform').setup {
   format_on_save = function(bufnr)
     -- enable or override formatters for on-save formatting
     local enabled_filetypes = {
-      lua = true,
-      python = true,
-      markdown = true,
-      rust = true,
+      bib = true,
+      bibtex = true,
       json = true,
       jsonc = true,
+      lua = true,
+      markdown = true,
       org = 'trim_whitespace',
-      tex = 'trim_whitespace',
+      python = true,
+      rust = true,
       sh = true,
+      tex = 'trim_whitespace',
     }
 
     local choice = enabled_filetypes[vim.bo[bufnr].filetype]
@@ -33,15 +35,33 @@ require('conform').setup {
   },
 
   formatters_by_ft = {
-    lua = { 'stylua' },
-    python = { 'ruff_format' },
-    markdown = { 'prettier' },
-    rust = { 'rustfmt' },
+    bib = { 'bibtex-tidy' },
+    bibtex = { 'bibtex-tidy' },
     json = { 'prettier' },
     jsonc = { 'prettier' },
-    tex = { 'tex-fmt' },
+    lua = { 'stylua' },
+    markdown = { 'prettier' },
+    python = { 'ruff_format' },
+    rust = { 'rustfmt' },
     sh = { 'shfmt' },
+    tex = { 'tex-fmt' },
     ['_'] = { 'trim_whitespace' },
+  },
+
+  formatters = {
+    ['bibtex-tidy'] = {
+      command = 'bibtex-tidy',
+      args = {
+        '--curly',
+        '--numeric',
+        '--blank-lines',
+        '--duplicates=key,doi,citation',
+        '--remove-empty-fields',
+        '--trailing-commas',
+        '--enclosing-braces',
+      },
+      stdin = true,
+    },
   },
 }
 
