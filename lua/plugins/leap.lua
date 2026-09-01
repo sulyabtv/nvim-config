@@ -3,6 +3,8 @@ vim.pack.add { { src = 'https://codeberg.org/andyg/leap.nvim' } }
 local leap = require 'leap'
 -- disable autojumping to the first match
 leap.opts.safe_labels = ''
+-- display labels after the match instead of beginning
+leap.opts.offset_labels = true
 -- "reduce visual noise"
 leap.opts.preview = function(ch0, ch1, ch2) return not (ch1:match '%s' or (ch0:match '%a' and ch1:match '%a' and ch2:match '%a')) end
 
@@ -45,4 +47,5 @@ local clever_f, clever_t = clever('f', 'F'), clever('t', 'T')
 vim.keymap.set({ 'n', 'x', 'o' }, 'f', function() ft { opts = clever_f } end)
 vim.keymap.set({ 'n', 'x', 'o' }, 'F', function() ft { backward = true, opts = clever_f } end)
 vim.keymap.set({ 'n', 'x', 'o' }, 't', function() ft { offset = -1, opts = clever_t } end)
+
 vim.keymap.set({ 'n', 'x', 'o' }, 'T', function() ft { backward = true, offset = 1, opts = clever_t } end)

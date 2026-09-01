@@ -1,4 +1,3 @@
-vim.g.tex_flavor = 'latex' -- treat .tex as latex
 -- let treesitter win over vimtex
 vim.g.vimtex_syntax_enabled = 0
 vim.g.vimtex_syntax_conceal_disable = 1

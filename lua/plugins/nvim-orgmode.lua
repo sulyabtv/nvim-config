@@ -1,10 +1,7 @@
 vim.pack.add {
   { src = 'https://github.com/nvim-orgmode/orgmode' },
-  { src = 'https://github.com/danilshvalov/org-modern.nvim' },
   { src = 'https://github.com/nvim-orgmode/org-bullets.nvim' },
 }
-
-local Menu = require 'org-modern.menu'
 
 require('orgmode').setup {
   org_agenda_files = '~/syncthing/**/*',
@@ -70,7 +67,7 @@ require('orgmode').setup {
         },
       },
     },
-    t = {
+    T = {
       description = 'Talks',
       types = {
         {
@@ -98,14 +95,6 @@ require('orgmode').setup {
       org_backward_heading_same_level = '[h',
       outline_up_heading = '[p',
     },
-  },
-
-  ui = {
-    menu = {
-      ---@diagnostic disable-next-line: redundant-parameter
-      handler = function(data) Menu:new():open(data) end,
-    },
-    input = { use_vim_ui = true },
   },
 }
 -- Experimental LSP support

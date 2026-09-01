@@ -257,3 +257,10 @@ vim.keymap.set('i', '<M-BS>', '<C-w>', { desc = 'Delete word backward' })
 -- Diagnostics
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic quickfix list' })
 vim.keymap.set('n', '<leader>td', function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end, { desc = 'Toggle diagnostics' })
+
+-- Consistent indentation in different modes
+vim.keymap.set('n', '<C-t>', 'i<C-t><Esc>', { desc = 'Indent line right' })
+vim.keymap.set('n', '<C-S-t>', 'i<C-d><Esc>', { desc = 'Indent line left' })
+vim.keymap.set('i', '<C-S-t>', '<C-d>', { desc = 'Indent line left' })
+vim.keymap.set('x', '<C-t>', '>gv', { desc = 'Indent selection right' })
+vim.keymap.set('x', '<C-S-t>', '<gv', { desc = 'Indent selection left' })
