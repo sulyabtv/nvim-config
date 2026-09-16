@@ -36,7 +36,9 @@ require('lualine').setup {
       { 'diff' },
       { 'diagnostics' },
     },
-    lualine_c = {},
+    lualine_c = {
+      { 'filename', path = 1 },
+    },
     lualine_x = {
       { macro_recording, color = 'WarningMsg' },
       { 'searchcount' },

@@ -9,5 +9,6 @@ local function tab_and_explorer(cmd)
 end
 
 vim.keymap.set('n', '<leader>nt', function() tab_and_explorer 'tabnew' end, { desc = 'New tab' })
+vim.keymap.set('n', '<leader>mt', function() tab_and_explorer 'ScopeMoveBuf' end, { desc = 'Move buffer to tab' })
 vim.keymap.set('n', ']t', function() tab_and_explorer 'tabnext' end, { desc = 'Next tab' })
 vim.keymap.set('n', '[t', function() tab_and_explorer 'tabprevious' end, { desc = 'Prev tab' })
