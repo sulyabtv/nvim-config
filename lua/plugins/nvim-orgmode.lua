@@ -34,13 +34,33 @@ require('orgmode').setup {
   },
 
   org_agenda_custom_commands = {
-    o = {
-      description = 'Overdue',
+    w = {
+      description = 'Work (tasks due)',
       types = {
         {
           type = 'tags_todo',
-          match = 'DEADLINE<"<today>"|SCHEDULED<"<today>"',
-          org_agenda_overriding_header = 'Overdue',
+          match = '+work+DEADLINE<="<today>"|+work+SCHEDULED<="<today>")',
+          org_agenda_overriding_header = 'Work',
+        },
+      },
+    },
+    p = {
+      description = 'Personal (tasks due)',
+      types = {
+        {
+          type = 'tags_todo',
+          match = '+personal+DEADLINE<="<today>"|+personal+SCHEDULED<="<today>")',
+          org_agenda_overriding_header = 'Personal',
+        },
+      },
+    },
+    d = {
+      description = 'All tasks due',
+      types = {
+        {
+          type = 'tags_todo',
+          match = 'DEADLINE<="<today>"|SCHEDULED<="<today>"',
+          org_agenda_overriding_header = 'Due',
           -- merge with agenda view if these can be excluded from it
         },
       },
@@ -50,7 +70,7 @@ require('orgmode').setup {
       types = {
         {
           type = 'tags',
-          match = '+note+DATE<"<+1d>"',
+          match = '+note+DATE<="<today>"',
           org_agenda_overriding_header = 'Notes',
           -- would be nice to sort by note date or alphabetically
         },
@@ -61,7 +81,7 @@ require('orgmode').setup {
       types = {
         {
           type = 'tags',
-          match = '+meeting+DATE<"<+1d>"',
+          match = '+meeting+DATE<="<today>"',
           org_agenda_overriding_header = 'Meetings',
           -- would be nice to sort by note date or alphabetically
         },
@@ -72,7 +92,7 @@ require('orgmode').setup {
       types = {
         {
           type = 'tags',
-          match = '+talk+DATE<"<+1d>"|+conference',
+          match = '+talk+DATE<="<today>"|+conference',
           org_agenda_overriding_header = 'Talks',
           -- would be nice to sort by note date or alphabetically
         },
@@ -101,13 +121,6 @@ require('orgmode').setup {
 vim.lsp.enable 'org'
 
 require('org-bullets').setup()
-
--- Convenience mapping to convert md links to org
-vim.keymap.set('n', '<leader>olc', function()
-  local line = vim.api.nvim_get_current_line()
-  local new_line = line:gsub('%[([^%]]+)%]%(([^)]+)%)', '[[%2][%1]]')
-  vim.api.nvim_set_current_line(new_line)
-end, { desc = 'Convert markdown links on current line' })
 
 -- Make verbatim visually distinct from code
 vim.api.nvim_create_autocmd('ColorScheme', {
