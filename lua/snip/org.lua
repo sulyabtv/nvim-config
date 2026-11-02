@@ -1,23 +1,27 @@
 local ls = require 'luasnip'
+local dates = require 'util.dates'
+
 local s = ls.snippet
 local i = ls.insert_node
 local t = ls.text_node
 local f = ls.function_node
 
-local function today(fmt)
-  return function() return os.date(fmt) end
-end
-
 return {
   s('note', {
     t '[',
-    f(today '%Y-%m-%d', {}),
+    f(dates.today '%Y-%m-%d', {}),
     t '] ',
     i(1, 'title'),
     t { '', ':PROPERTIES:', ':DATE: [' },
-    f(today '%Y-%m-%d %a', {}),
+    f(dates.today '%Y-%m-%d %a', {}),
     t { ']', ':END:', '', '' },
     i(0),
+  }),
+  s('week', {
+    f(function()
+      local year, week, mon, sun = dates.iso_week '%Y-%m-%d %a'
+      return ('%s Week %s [%s]--[%s]'):format(year, week, mon, sun)
+    end, {}),
   }),
   s('link', {
     t '[[',
@@ -29,7 +33,7 @@ return {
   }),
   s('clipboard-link', {
     t '[[',
-    f(function() return (vim.fn.getreg '+' or ''):gsub('\n$', ''):gsub('\n', ' ') end, {}),
+    f(function() return ((vim.fn.getreg '+'):gsub('\n$', ''):gsub('\n', ' ')) end, {}),
     t '][',
     i(1, 'description'),
     t ']]',

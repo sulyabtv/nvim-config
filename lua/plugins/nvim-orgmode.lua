@@ -21,7 +21,7 @@ require('orgmode').setup {
 
   org_priority_highest = 'A',
   org_priority_lowest = 'E',
-  org_priority_default = 'C',
+  org_priority_default = 'D',
 
   org_todo_keywords = {
     'TODO(t)',
