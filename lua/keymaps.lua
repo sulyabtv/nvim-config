@@ -38,7 +38,7 @@ vim.keymap.set('n', '<leader>tx', function()
 end, { desc = 'Toggle tmux status bar' })
 
 -- toggle neovim statusline
-vim.keymap.set('n', '<leader>ts', function() vim.o.laststatus = vim.o.laststatus == 0 and 3 or 0 end, { desc = 'Toggle statusline' })
+vim.keymap.set('n', '<leader>tS', function() vim.o.laststatus = vim.o.laststatus == 0 and 3 or 0 end, { desc = 'Toggle statusline' })
 
 -- Toggle spellcheck
 vim.keymap.set('n', '<leader>ts', function() vim.wo.spell = not vim.wo.spell end, { desc = 'Toggle spellcheck' })
@@ -117,107 +117,94 @@ vim.keymap.set('n', ']Z', function() next_closed_fold 'forward' end, { desc = 'N
 vim.keymap.set('n', '[Z', function() next_closed_fold 'backward' end, { desc = 'Prev closed fold' })
 
 -- (Hopefully) better semantics for { / }
-local function is_paragraph_end(row, total) return not vim.fn.getline(row):match '^%s*$' and (row == total or vim.fn.getline(row + 1):match '^%s*$') end
+-- A paragraph is a run of non-blank lines.
+-- `}` / `{` jump to the first non-blank character of the next / previous paragraph start,
+-- `g}` / `g{` to the last character of the next / previous paragraph end.
+-- Closed folds count as one line.
 
-local function is_paragraph_start(row) return not vim.fn.getline(row):match '^%s*$' and (row == 1 or vim.fn.getline(row - 1):match '^%s*$') end
+local function is_blank(row) return vim.fn.getline(row):match '^%s*$' ~= nil end
 
 local function fold_visible_row(row)
   local fold_start = vim.fn.foldclosed(row)
   return fold_start == -1 and row or fold_start
 end
 
+-- The next visible row in `direction` (1 or -1), treating a closed fold as a
+-- single row. Returns `row` itself at the buffer boundary.
 local function advance(row, direction)
   local total = vim.fn.line '$'
-  local function clamp(n) return math.max(1, math.min(n, total)) end
-  local next_row = clamp(row + direction)
+  local next_row = math.max(1, math.min(row + direction, total))
   local fold_start = vim.fn.foldclosed(next_row)
   if fold_start == -1 then return next_row end -- not in a fold
+  if fold_start ~= row then return fold_start end -- a different fold: land on its first line
+  -- next_row is inside the fold we are already on: skip past it
+  local fold_end = vim.fn.foldclosedend(next_row)
+  if fold_end >= total then return row end
+  return fold_end + 1
+end
 
-  if row == fold_start then
-    if direction > 0 then
-      local fold_end = vim.fn.foldclosedend(next_row)
-      if fold_end == total then return row end -- do not move if the fold covers the last line
-      return fold_end + 1
+local function is_paragraph_start(row)
+  if is_blank(row) then return false end
+  local prev = advance(row, -1)
+  return prev == row or is_blank(prev)
+end
+
+local function is_paragraph_end(row)
+  if is_blank(row) then return false end
+  local next = advance(row, 1)
+  return next == row or is_blank(next)
+end
+
+-- Move at least one row in `direction`, then keep going until `is_boundary`.
+-- Returns the row reached (the buffer boundary if no boundary was found).
+local function find_boundary(row, direction, is_boundary)
+  local next = advance(row, direction)
+  while next ~= row do
+    row = next
+    if is_boundary(row) then return row end
+    next = advance(row, direction)
+  end
+  return row
+end
+
+local function paragraph_motion(direction, is_boundary, to_line_end)
+  return function()
+    local operator_pending = vim.api.nvim_get_mode().mode:sub(1, 2) == 'no'
+    local row = fold_visible_row(vim.fn.line '.')
+    for _ = 1, vim.v.count1 do
+      local next = find_boundary(row, direction, is_boundary)
+      if next == row then break end
+      row = next
+    end
+
+    vim.cmd "normal! m'" -- jumplist entry
+    if to_line_end and operator_pending and direction < 0 then
+      -- Backward with an operator: exclusive motion ending just after the
+      -- paragraph (`dg{` deletes everything between the previous paragraph
+      -- and the cursor, keeping that paragraph intact).
+      vim.api.nvim_win_set_cursor(0, { advance(row, 1), 0 })
+    elseif to_line_end then
+      -- Forward with an operator: inclusive, so `dg}` deletes through the end
+      -- of the paragraph, like `d$` does for a line.
+      if operator_pending then vim.cmd 'normal! v' end
+      local line = vim.fn.getline(row)
+      local col = #line == 0 and 0 or vim.fn.byteidx(line, vim.fn.strchars(line) - 1)
+      vim.api.nvim_win_set_cursor(0, { row, col })
     else
-      if fold_start == 1 then return row end -- do not move if the fold covers the first line
-      return fold_start - 1
+      vim.api.nvim_win_set_cursor(0, { row, 0 })
+      -- With an operator stay in column 0 so Vim's exclusive-linewise rules
+      -- apply (`d}` from the start of a line deletes whole lines). See
+      -- `:help exclusive-linewise`.
+      if not operator_pending then vim.cmd 'normal! ^' end
     end
   end
-
-  return fold_start
 end
 
-local function next_paragraph_end()
-  local total = vim.fn.line '$'
-  local row = fold_visible_row(vim.fn.line '.')
-
-  -- if we are at the end of a paragraph move down one line
-  if row < total and is_paragraph_end(row, total) then row = advance(row, 1) end
-  -- keep moving down until we reach the end of a paragraph
-  while row < total and (vim.fn.getline(row):match '^%s*$' or not vim.fn.getline(row + 1):match '^%s*$') do
-    local before = row
-    row = advance(row, 1)
-    if row == before then break end
-  end
-
-  vim.api.nvim_win_set_cursor(0, { row, 0 })
-  vim.cmd 'normal! ^'
-end
-
-local function next_paragraph_start()
-  local total = vim.fn.line '$'
-  local row = fold_visible_row(vim.fn.line '.')
-
-  -- if we are at the beginning of a paragraph move down one line
-  if row < total and is_paragraph_start(row) then row = advance(row, 1) end
-  -- keep moving down until we reach the beginning of a paragraph
-  while row < total and (vim.fn.getline(row):match '^%s*$' or (row > 1 and not vim.fn.getline(row - 1):match '^%s*$')) do
-    local before = row
-    row = advance(row, 1)
-    if row == before then break end
-  end
-
-  vim.api.nvim_win_set_cursor(0, { row, 0 })
-  vim.cmd 'normal! ^'
-end
-
-local function prev_paragraph_end()
-  local total = vim.fn.line '$'
-  local row = fold_visible_row(vim.fn.line '.')
-
-  -- if we are at the end of a paragraph move up one line
-  if row > 1 and is_paragraph_end(row, total) then row = advance(row, -1) end
-  -- keep moving up until we reach the end of a paragraph
-  while row > 1 and (vim.fn.getline(row):match '^%s*$' or (row < total and not vim.fn.getline(row + 1):match '^%s*$')) do
-    local before = row
-    row = advance(row, -1)
-    if row == before then break end
-  end
-
-  vim.api.nvim_win_set_cursor(0, { row, 0 })
-  vim.cmd 'normal! ^'
-end
-
-local function prev_paragraph_start()
-  local row = fold_visible_row(vim.fn.line '.')
-
-  -- if we are at the start of a paragraph move up one line
-  if row > 1 and is_paragraph_start(row) then row = advance(row, -1) end
-  -- keep moving up until we reach the start of a paragraph
-  while row > 1 and (vim.fn.getline(row):match '^%s*$' or not vim.fn.getline(row - 1):match '^%s*$') do
-    local before = row
-    row = advance(row, -1)
-    if row == before then break end
-  end
-
-  vim.api.nvim_win_set_cursor(0, { row, 0 })
-  vim.cmd 'normal! ^'
-end
-
-vim.keymap.set('n', '}', next_paragraph_start, { desc = 'Next paragraph start' })
-vim.keymap.set('n', '{', prev_paragraph_start, { desc = 'Prev paragraph start' })
-vim.keymap.set('n', 'g}', next_paragraph_end, { desc = 'Next paragraph end' })
-vim.keymap.set('n', 'g{', prev_paragraph_end, { desc = 'Prev paragraph end' })
+local modes = { 'n', 'x', 'o' }
+vim.keymap.set(modes, '}', paragraph_motion(1, is_paragraph_start, false), { desc = 'Next paragraph start' })
+vim.keymap.set(modes, '{', paragraph_motion(-1, is_paragraph_start, false), { desc = 'Prev paragraph start' })
+vim.keymap.set(modes, 'g}', paragraph_motion(1, is_paragraph_end, true), { desc = 'Next paragraph end' })
+vim.keymap.set(modes, 'g{', paragraph_motion(-1, is_paragraph_end, true), { desc = 'Prev paragraph end' })
 
 -- Move around faster using M-<Up/Down/Left/Right>
 vim.keymap.set({ 'n', 'i', 'x' }, '<M-Right>', function()
@@ -252,7 +239,12 @@ vim.keymap.set({ 'n', 'x' }, '<Down>', 'gj', { desc = 'Down' })
 vim.keymap.set({ 'n', 'x' }, '<Up>', 'gk', { desc = 'Up' })
 
 -- M-BS to delete word in insert mode
-vim.keymap.set('i', '<M-BS>', '<C-w>', { desc = 'Delete word backward' })
+vim.keymap.set('i', '<M-BS>', '<C-g>u<C-w>', { desc = 'Delete word backward' })
+
+-- Add undo breakpoints at punctuation in insert mode
+for _, ch in ipairs { ',', '.', '!', '?', ';', ':' } do
+  vim.keymap.set('i', ch, ch .. '<C-g>u')
+end
 
 -- Diagnostics
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic quickfix list' })
