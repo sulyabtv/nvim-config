@@ -46,6 +46,29 @@ vim.keymap.set('n', '<leader>ts', function() vim.wo.spell = not vim.wo.spell end
 -- Copy whole file to clipboard
 vim.keymap.set('n', '<C-c>', '<cmd>%y+<cr>', { desc = 'Copy whole file to clipboard' })
 
+-- Only yanks go to the system clipboard.
+-- Delete/change/cut operations go to the `c` register instead.
+for _, k in ipairs { 'c', 'C', 'd', 'D', 'x', 'X' } do
+  vim.keymap.set({ 'n', 'x' }, k, '"c' .. k, { desc = k .. ' into the cut register' })
+end
+-- gp / gP paste from the cut register
+vim.keymap.set('n', 'gp', '"cp', { desc = 'Paste last cut after cursor' })
+vim.keymap.set('n', 'gP', '"cP', { desc = 'Paste last cut before cursor' })
+-- Pasting over a selection:
+-- lowercase `p` / `gp` perform a cut (the replaced text becomes the new cut),
+-- uppercase `P` / `gP` discard the replaced text so the cut register is kept.
+---@param from_cut boolean paste the cut register instead of the clipboard
+local function paste_over_selection(from_cut)
+  local mode = vim.fn.mode()
+  local replaced = vim.fn.getregion(vim.fn.getpos 'v', vim.fn.getpos '.', { type = mode })
+  local regtype = mode == 'V' and 'V' or mode == '\22' and 'b' or 'v'
+  vim.cmd('normal! ' .. vim.v.count1 .. '"' .. (from_cut and 'c' or '+') .. 'P')
+  vim.fn.setreg('c', replaced, regtype)
+end
+vim.keymap.set('x', 'p', function() paste_over_selection(false) end, { desc = 'Paste over selection' })
+vim.keymap.set('x', 'gp', function() paste_over_selection(true) end, { desc = 'Paste last cut over selection' })
+vim.keymap.set('x', 'gP', '"cP', { desc = 'Paste last cut over selection (keep the cut)' })
+
 -- vim pack shortcuts
 vim.keymap.set('n', '<leader>pu', function() vim.pack.update(nil, { force = true }) end, { desc = 'Pack: update plugins' })
 vim.keymap.set('n', '<leader>pl', function() vim.pack.update(nil, { offline = true }) end, { desc = 'Pack: list installed plugins' })
