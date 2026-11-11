@@ -166,8 +166,8 @@ vim.keymap.set('n', '<leader>lg', function() Snacks.picker.diagnostics_buffer() 
 vim.keymap.set('n', '<leader>lG', function() Snacks.picker.diagnostics() end, { desc = 'Diagnostics (workspace)' })
 vim.keymap.set('n', '<leader>li', function() Snacks.picker.lsp_incoming_calls() end, { desc = 'Incoming calls' })
 vim.keymap.set('n', '<leader>lo', function() Snacks.picker.lsp_outgoing_calls() end, { desc = 'Outgoing calls' })
-vim.keymap.set('n', ']r', function() Snacks.words.jump(1) end, { desc = 'Next reference' })
-vim.keymap.set('n', '[r', function() Snacks.words.jump(-1) end, { desc = 'Prev reference' })
+vim.keymap.set('n', ']r', function() Snacks.words.jump(vim.v.count1) end, { desc = 'Next reference' })
+vim.keymap.set('n', '[r', function() Snacks.words.jump(-vim.v.count1) end, { desc = 'Prev reference' })
 
 -- history
 vim.keymap.set('n', '<leader>h:', function() Snacks.picker.command_history() end, { desc = 'Command history' })
