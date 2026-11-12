@@ -7,6 +7,12 @@ local t = ls.text_node
 local f = ls.function_node
 
 return {
+  s('h1', { t '* ', i(1, 'heading'), i(0) }),
+  s('h2', { t '** ', i(1, 'heading'), i(0) }),
+  s('h3', { t '*** ', i(1, 'heading'), i(0) }),
+  s('h4', { t '**** ', i(1, 'heading'), i(0) }),
+  s('h5', { t '***** ', i(1, 'heading'), i(0) }),
+  s('h6', { t '****** ', i(1, 'heading'), i(0) }),
   s('note', {
     t '[',
     f(dates.today '%Y-%m-%d', {}),
@@ -39,10 +45,22 @@ return {
     t ']]',
     i(0),
   }),
-  s('h1', { t '* ', i(1, 'heading'), i(0) }),
-  s('h2', { t '** ', i(1, 'heading'), i(0) }),
-  s('h3', { t '*** ', i(1, 'heading'), i(0) }),
-  s('h4', { t '**** ', i(1, 'heading'), i(0) }),
-  s('h5', { t '***** ', i(1, 'heading'), i(0) }),
-  s('h6', { t '****** ', i(1, 'heading'), i(0) }),
+  s('papernote', {
+    t '* ',
+    i(1, 'title'),
+    t { '', '', '- [[' },
+    i(2, 'ITEM_LINK'),
+    t { '][Zotero link]]', '', '** NABC', '', '*** Need', '', '- ' },
+    i(3),
+    t { '', '', '*** Approach', '', '- ' },
+    i(4),
+    t { '', '', '*** Benefits', '', '- ' },
+    i(5),
+    t { '', '', '*** Challenges', '', '- ' },
+    i(6),
+    t { '', '', '** Details', '', '- ' },
+    i(7),
+    t { '', '', '** Takeaways for my research', '', '- ' },
+    i(0),
+  }),
 }

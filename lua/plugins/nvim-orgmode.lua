@@ -39,7 +39,7 @@ require('orgmode').setup {
       types = {
         {
           type = 'tags_todo',
-          match = '+work+DEADLINE<="<today>"|+work+SCHEDULED<="<today>")',
+          match = '+work+DEADLINE<="<today>"|+work+SCHEDULED<="<today>"',
           org_agenda_overriding_header = 'Work',
         },
       },
@@ -49,7 +49,7 @@ require('orgmode').setup {
       types = {
         {
           type = 'tags_todo',
-          match = '+personal+DEADLINE<="<today>"|+personal+SCHEDULED<="<today>")',
+          match = '+personal+DEADLINE<="<today>"|+personal+SCHEDULED<="<today>"',
           org_agenda_overriding_header = 'Personal',
         },
       },

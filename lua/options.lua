@@ -38,6 +38,40 @@ vim.o.showmode = false
 -- Sync clipboard between OS and Neovim.
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
+-- Over SSH inside tmux, Neovim's builtin tmux provider sleeps a fixed 50 ms
+-- after requesting the clipboard, so the paste may read the previous buffer.
+-- This provider waits for the new buffer to actually arrive instead.
+if vim.env.SSH_TTY and vim.env.TMUX and vim.fn.executable 'tmux' == 1 then
+  local function tmux(args)
+    local result = vim.system(vim.list_extend({ 'tmux' }, args), { text = true }):wait()
+    return result.code == 0 and result.stdout or nil
+  end
+
+  local function newest_buffer() return (tmux { 'list-buffers', '-F', '#{buffer_name}' } or ''):match '^[^\n]*' end
+
+  local function paste()
+    local before = newest_buffer()
+    -- Ask the terminal for its clipboard; tmux stores the reply as a new buffer.
+    -- If there is no attached client this fails and we fall back to the current buffer.
+    if tmux { 'refresh-client', '-l' } then vim.wait(500, function() return newest_buffer() ~= before end, 10) end
+    local out = tmux { 'save-buffer', '-' }
+    if not out then return 0 end
+    -- keep a trailing empty element: that is how Neovim infers a linewise register
+    return vim.split(out, '\n', { plain = true })
+  end
+
+  -- `-w` also forwards the yank to the outer terminal's clipboard (tmux >= 3.2)
+  local version = vim.version.parse(tmux { '-V' } or '')
+  local copy = version and not vim.version.lt(version, { 3, 2, 0 }) and { 'tmux', 'load-buffer', '-w', '-' } or { 'tmux', 'load-buffer', '-' }
+
+  vim.g.clipboard = {
+    name = 'tmux (wait for terminal reply)',
+    copy = { ['+'] = copy, ['*'] = copy },
+    paste = { ['+'] = paste, ['*'] = paste },
+    cache_enabled = 0,
+  }
+end
+
 -- Wrap, etc.
 -- Sadly, Neovim does not have soft-wrap at arbitrary columns.
 -- See https://github.com/neovim/neovim/issues/4386

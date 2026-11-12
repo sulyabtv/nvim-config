@@ -71,7 +71,7 @@ vim.keymap.set('x', 'gP', '"cP', { desc = 'Paste last cut over selection (keep t
 
 -- vim pack shortcuts
 vim.keymap.set('n', '<leader>pu', function() vim.pack.update(nil, { force = true }) end, { desc = 'Pack: update plugins' })
-vim.keymap.set('n', '<leader>pl', function() vim.pack.update(nil, { offline = true }) end, { desc = 'Pack: list installed plugins' })
+vim.keymap.set('n', '<leader>pi', function() vim.pack.update(nil, { offline = true }) end, { desc = 'Pack: list installed plugins' })
 vim.keymap.set('n', '<leader>pd', function()
   local names = {}
   for _, p in ipairs(vim.pack.get()) do
