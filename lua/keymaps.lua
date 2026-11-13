@@ -231,6 +231,43 @@ vim.keymap.set(modes, 'g{', row_motion(-1, is_paragraph_end, { to_edge = true, t
 vim.keymap.set(modes, ']Z', row_motion(1, is_closed_fold, { not_found = 'No more closed folds' }), { desc = 'Next closed fold' })
 vim.keymap.set(modes, '[Z', row_motion(-1, is_closed_fold, { not_found = 'No more closed folds' }), { desc = 'Prev closed fold' })
 
+-- Navigate display lines using arrow keys, except in operator-pending mode.
+local insert_curswant, insert_last_pos
+local function insert_display_line(motion)
+  return function()
+    local cur = vim.api.nvim_win_get_cursor(0)
+    -- Any cursor movement since our last move => forget the column
+    if insert_last_pos and cur[1] == insert_last_pos[1] and cur[2] == insert_last_pos[2] then vim.fn.winrestview { curswant = insert_curswant } end
+    vim.cmd('normal! ' .. motion)
+    -- getcurpos() reports curswant one-based, winrestview() takes it zero-based; MAXCOL means "end of line"
+    local curswant = vim.fn.getcurpos()[5]
+    insert_curswant = curswant >= 2147483647 and curswant or curswant - 1
+    -- `normal!` stops on the last character; in insert mode the cursor may sit past it
+    local line = vim.api.nvim_get_current_line()
+    if insert_curswant >= vim.fn.strdisplaywidth(line) then vim.api.nvim_win_set_cursor(0, { vim.fn.line '.', #line }) end
+    insert_last_pos = vim.api.nvim_win_get_cursor(0)
+  end
+end
+-- Forget the remembered column when insert mode is left/entered or text changes
+vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave', 'TextChangedI' }, {
+  group = vim.api.nvim_create_augroup('insert-display-line', { clear = true }),
+  callback = function() insert_last_pos = nil end,
+})
+vim.keymap.set({ 'n', 'x' }, '<Down>', 'gj', { desc = 'Down (display line)' })
+vim.keymap.set({ 'n', 'x' }, '<Up>', 'gk', { desc = 'Up (display line)' })
+vim.keymap.set('i', '<Down>', insert_display_line 'gj', { desc = 'Down (display line)' })
+vim.keymap.set('i', '<Up>', insert_display_line 'gk', { desc = 'Up (display line)' })
+vim.keymap.set('s', '<Down>', '<C-o>gj', { desc = 'Down (display line)' })
+vim.keymap.set('s', '<Up>', '<C-o>gk', { desc = 'Up (display line)' })
+vim.keymap.set('n', '<S-Down>', 'vgj<C-g>', { desc = 'Select down (display line)' })
+vim.keymap.set('n', '<S-Up>', 'vgk<C-g>', { desc = 'Select up (display line)' })
+vim.keymap.set('i', '<S-Down>', '<C-\\><C-o>vgj<C-g>', { desc = 'Select down (display line)' })
+vim.keymap.set('i', '<S-Up>', '<C-\\><C-o>vgk<C-g>', { desc = 'Select up (display line)' })
+vim.keymap.set('x', '<S-Down>', 'gj', { desc = 'Select down (display line)' })
+vim.keymap.set('x', '<S-Up>', 'gk', { desc = 'Select up (display line)' })
+vim.keymap.set('s', '<S-Down>', '<C-o>gj', { desc = 'Select down (display line)' })
+vim.keymap.set('s', '<S-Up>', '<C-o>gk', { desc = 'Select up (display line)' })
+
 -- Move around faster using M-<Up/Down/Left/Right>
 vim.keymap.set({ 'n', 'i', 'x' }, '<M-Right>', function()
   local line_before = vim.fn.line '.'
@@ -249,31 +286,11 @@ vim.keymap.set({ 'n', 'i', 'x' }, '<M-Left>', function()
   end
 end, { desc = 'Move one word left' })
 
-vim.keymap.set({ 'n', 'i', 'x' }, '<M-Up>', function()
-  local n = math.max(1, math.floor(vim.api.nvim_win_get_height(0) / 5))
-  vim.cmd('normal! ' .. n .. 'gk')
-end, { desc = 'Jump up few lines' })
-
-vim.keymap.set({ 'n', 'i', 'x' }, '<M-Down>', function()
-  local n = math.max(1, math.floor(vim.api.nvim_win_get_height(0) / 5))
-  vim.cmd('normal! ' .. n .. 'gj')
-end, { desc = 'Jump down few lines' })
-
--- Navigate display lines using arrow keys, except in operator-pending mode.
-vim.keymap.set({ 'n', 'x' }, '<Down>', 'gj', { desc = 'Down (display line)' })
-vim.keymap.set({ 'n', 'x' }, '<Up>', 'gk', { desc = 'Up (display line)' })
-vim.keymap.set('i', '<Down>', '<C-\\><C-o>gj', { desc = 'Down (display line)' })
-vim.keymap.set('i', '<Up>', '<C-\\><C-o>gk', { desc = 'Up (display line)' })
-vim.keymap.set('s', '<Down>', '<C-o>gj', { desc = 'Down (display line)' })
-vim.keymap.set('s', '<Up>', '<C-o>gk', { desc = 'Up (display line)' })
-vim.keymap.set('n', '<S-Down>', 'vgj<C-g>', { desc = 'Select down (display line)' })
-vim.keymap.set('n', '<S-Up>', 'vgk<C-g>', { desc = 'Select up (display line)' })
-vim.keymap.set('i', '<S-Down>', '<C-\\><C-o>vgj<C-g>', { desc = 'Select down (display line)' })
-vim.keymap.set('i', '<S-Up>', '<C-\\><C-o>vgk<C-g>', { desc = 'Select up (display line)' })
-vim.keymap.set('x', '<S-Down>', 'gj', { desc = 'Select down (display line)' })
-vim.keymap.set('x', '<S-Up>', 'gk', { desc = 'Select up (display line)' })
-vim.keymap.set('s', '<S-Down>', '<C-o>gj', { desc = 'Select down (display line)' })
-vim.keymap.set('s', '<S-Up>', '<C-o>gk', { desc = 'Select up (display line)' })
+local function few_lines() return math.max(1, math.floor(vim.api.nvim_win_get_height(0) / 5)) end
+vim.keymap.set({ 'n', 'x' }, '<M-Up>', function() vim.cmd('normal! ' .. few_lines() .. 'gk') end, { desc = 'Jump up few lines' })
+vim.keymap.set({ 'n', 'x' }, '<M-Down>', function() vim.cmd('normal! ' .. few_lines() .. 'gj') end, { desc = 'Jump down few lines' })
+vim.keymap.set('i', '<M-Up>', function() insert_display_line(few_lines() .. 'gk')() end, { desc = 'Jump up few lines' })
+vim.keymap.set('i', '<M-Down>', function() insert_display_line(few_lines() .. 'gj')() end, { desc = 'Jump down few lines' })
 
 -- M-BS to delete word in insert mode
 vim.keymap.set('i', '<M-BS>', '<C-g>u<C-w>', { desc = 'Delete word backward' })
